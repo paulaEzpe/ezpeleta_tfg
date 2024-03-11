@@ -33,7 +33,7 @@ def borrar_json (collection):
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
-    #borrar_json(collection)
+    # borrar_json(collection)
     insertar_json(db, collection)
     print("All jsons correctly inserted")
 except Exception as e:

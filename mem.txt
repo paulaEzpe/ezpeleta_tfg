@@ -1,0 +1,9 @@
+primero hacer el frontend con react-bootstrap
+luego hacer el backend en python con venv y flask
+luego usar mongoDB para intentar meter jsons en la bd 
+los 49jsons de la bd se metieron bien pero no iban a caber todos
+del resto porque eran en total 50gb sin descomprimir lo q lo haria unos 250gb y mondodb atlas ofrece 512mb.
+se hizo una prueba de carga y se comprobo que cabian unos 2600 jsons. nada que ver con todos los que habia que cargar
+por tanto se paso a utilizar otra bd. se barajó tambien con cassandra poque tb almacena jsons, pero siendo que a parte de almacenarlos tb hay que indexafrlos para buscar rapidamente entre tanto documento, se paso a elegir opensearch. con docker, ya que es la opcion que recomiendan ellos.
+me daba error con el docker el opensearch ultima version de 2.10... asi que busque por internet y era porque no era estabble. use la 1.2.3 y luego me dio un error que se resolvio? con pip install 'urllib3<2'.
+problema al almacenar campos por el limite de los index, porque al almacenar 10 documentos, ya son un total de 20000 campos.

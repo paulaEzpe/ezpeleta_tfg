@@ -26,6 +26,18 @@ def insertar_json (data_base, collection):
     f.close()
 # --------------------------------------
 
+def reventar_bd(data_base, collection):
+    f = open("../datos/arXiv_src_2212_086.jsonl", "r")
+    line = f.readline()
+    line_json = json.loads(line)
+    for i in range(1,5000):
+        collection.insert_one({"_id": i, "data": line_json})
+    f.close()
+    print("he acabado de reventar ka bd")
+    
+
+# -----------------------------------------
+
 def borrar_json (collection):
     collection.delete_many({})
 # --------------------------------------
@@ -33,12 +45,12 @@ def borrar_json (collection):
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
-    # borrar_json(collection)
-    insertar_json(db, collection)
+    #borrar_json(collection)
+    #insertar_json(db, collection)
+    #reventar_bd(db, collection) // ha llegado hasta 2600
+    collection.find().sort( [['_id', -1]]).limit(1)
     print("All jsons correctly inserted")
 except Exception as e:
     print(e)
 
 
-
-# Send a ping to confirm a successful connection

@@ -1,3 +1,14 @@
+EJECUCION:
+    - para ejecutar el backend:
+    dentro de la carpeta backend: python3 server.py 
+
+    - para ejecutar el frontend:
+    dentro de la carpeta de frontend: npm start
+
+    - para ejecutar lo de opensearch:
+    dentro de la carpeta de opensearch: python3 high_client.py
+
+NOTAS:
 primero hacer el frontend con react-bootstrap
 luego hacer el backend en python con venv y flask
 luego usar mongoDB para intentar meter jsons en la bd 

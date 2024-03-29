@@ -1,5 +1,14 @@
+"""
+Nombre del archivo: high_client.py
+Autora: Paula Ezpeleta Castrillo
+Fecha de creación: 24/03/2024
+Descripción: Archivo que contiene el código necesario para todas las operaciones con OpenSearch
+
+"""
+
 # http://localhost:5601/
 # buscar en todos los archivos del directorio actual: grep -nr "texto" .
+
 
 
 from opensearchpy import OpenSearch
@@ -10,7 +19,7 @@ import json
 import time 
 
 
-
+#-----------------------------------------------------------------
 
 def conexion():
     host = 'localhost'
@@ -31,11 +40,12 @@ def conexion():
     )
     return client
 
+#-----------------------------------------------------------------
 
 def deserializar(linea):
     return json.loads(linea)
 
-
+#-----------------------------------------------------------------
 
 def insertar_carpeta(carpeta, client, index_name):
     files = [f for f in os.listdir(carpeta)]
@@ -50,6 +60,7 @@ def insertar_carpeta(carpeta, client, index_name):
     print("--- %s seconds ---" % (time.time() - start_time))
     print("--- %d insertados ---" % (insertados))
     
+#-----------------------------------------------------------------
 
 def insertar_json_serializado(client, index_name, json_file):
     # Abre el archivo JSONL
@@ -76,18 +87,9 @@ def insertar_json_serializado(client, index_name, json_file):
     print("Data inserted successfully.")
     return i
 
+#-----------------------------------------------------------------
 
 def obtener_numero_campos_ocupados(client, index_name):
-    """
-    Obtiene el número de campos ocupados en un índice.
-
-    Args:
-        client: Cliente de OpenSearch.
-        index_name: Nombre del índice del cual se quiere obtener el número de campos ocupados.
-    
-    Returns:
-        El número de campos ocupados en el índice.
-    """
     # Obtener el mapping del índice
     mapping = client.indices.get_mapping(index=index_name)
 
@@ -96,6 +98,7 @@ def obtener_numero_campos_ocupados(client, index_name):
 
     return numero_campos_ocupados
 
+#-----------------------------------------------------------------
 
 def obtener_paper_id_indice(indice, client):
     # Realiza una consulta de búsqueda para verificar si hay algún documento
@@ -113,7 +116,7 @@ def obtener_paper_id_indice(indice, client):
     else:
         return None
 
-
+#-----------------------------------------------------------------
 
 def obtener_documento_por_paper_id(client, index_name, paper_id):
     # Realiza una búsqueda utilizando el paper_id como filtro
@@ -127,9 +130,7 @@ def obtener_documento_por_paper_id(client, index_name, paper_id):
         print(f"No se encontró ningún documento con el paper_id '{paper_id}' en el índice '{index_name}'.")
 
 
-
-
-
+#-----------------------------------------------------------------
 
 def crear_indice(indice, client):
     index_name = indice
@@ -144,6 +145,7 @@ def crear_indice(indice, client):
     print("Se ha creado el índice")
     return response
 
+#-----------------------------------------------------------------
 
 # # Set up the opensearch-py version of the document
 # Movie.init(using=client)
@@ -159,20 +161,6 @@ def crear_indice(indice, client):
 # response = s.execute()
 
 
-# Perform a search query to check if there are any documents
-# response = client.search(index="my-dsl-index2", body={"query": {"match_all": {}}})
-
-# # Obtén los documentos de la respuesta
-# hits = response["hits"]["hits"]
-
-# # Imprime los documentos recuperados
-# if hits:
-#     print("Documents in the index:")
-#     for hit in hits:
-#         print(hit["_source"])
-# else:
-#     print("There are no documents in the index.")
-
 # new_settings = {
 #     "index.mapping.total_fields.limit": 20000  # Define el nuevo límite de campos totales
 # }
@@ -184,8 +172,7 @@ def crear_indice(indice, client):
 #json_file = "../datos/un_json.jsonl"
 #insertar_json(client, index_name, json_file)
 
-
-
+#-----------------------------------------------------------------
 
 def imprimir_numdoc_indice(indice, client):
     #Perform a search query to check if there are any documents
@@ -207,27 +194,6 @@ def imprimir_numdoc_indice(indice, client):
 
 #----------------------------------------------------------------------
 
-# Obtiene el número total de campos presentes en la configuración del índice
-# total_campos = index_settings[index_name]["settings"]["index"]["mapping"]["total_fields"]["limit"]
-# print(f"Total de campos almacenados en el índice '{index_name}': {total_campos}")
-
-#-------------------------------------------------------------------------
-
-
-#IMPRIMIR TODOS DOCUMENTOS DE INDICE
-# Imprime los documentos recuperados
-# if hits:
-#     print("Documents in the index:")
-#     for hit in hits:
-#         print(hit["_source"])
-# else:
-#     print("There are no documents in the index.")
-
-
-
-#----------------------------------------------------------------------------
-# eliminar todos los documentos del indice:
-
 def eliminar_documentos_indice(client, index_name):
     query_delete = {
         "query": {
@@ -241,8 +207,8 @@ def eliminar_documentos_indice(client, index_name):
     else:
         print(f"No se eliminaron documentos del índice {index_name}.")
 
-
 #--------------------------------------------------------
+
 def eliminar_indice(client, index_name):
     #Nombre del índice que deseas eliminar
 
@@ -254,7 +220,7 @@ def eliminar_indice(client, index_name):
     else:
         print(f"El índice '{index_name}' no existe.")
 
-
+#---------------------------------------------------------
 
 def verificar_insercion_json_data(client, index_name, paper_id):
     # Realiza una búsqueda utilizando el paper_id como filtro
@@ -272,6 +238,7 @@ def verificar_insercion_json_data(client, index_name, paper_id):
             return True
     return False
 
+#---------------------------------------------------------
 
 def imprimir_documentos_de_indice(client, index_name):
     # Realiza una búsqueda para obtener todos los documentos del índice
@@ -295,9 +262,8 @@ def imprimir_documentos_de_indice(client, index_name):
     else:
         print(f"No se encontraron documentos en el índice '{index_name}'.")
 
-
-
 ###################################################
+
 def main1():
     client = conexion()
     index_name = "carpeta_08"
@@ -315,12 +281,14 @@ def main1():
         print("El campo 'json_data' no se ha insertado correctamente.")
     #imprimir_documentos_de_indice(client, index_name)
     
-###################################################
+#-----------------------------------------------------------------
+
 def main2():
     files = insertar_carpeta("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset/21/")
     print(str(files))
     
-###################################################
+#-----------------------------------------------------------------
+
 def main_info():
     client = conexion()
     index_name = "carpeta_08"
@@ -328,7 +296,7 @@ def main_info():
     campos = obtener_campos_de_indice(client, index_name)
     print("Campos del índice:", campos)
     
-###################################################
+#-----------------------------------------------------------------
 
 def main_eliminar():
     client = conexion()
@@ -338,7 +306,7 @@ def main_eliminar():
     eliminar_indice(client, "carpeta_07")
     eliminar_indice(client, "solo")
 
-###################################################
+############################################################
 
 main_eliminar()
 

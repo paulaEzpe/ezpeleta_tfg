@@ -7,3 +7,14 @@ se hizo una prueba de carga y se comprobo que cabian unos 2600 jsons. nada que v
 por tanto se paso a utilizar otra bd. se barajó tambien con cassandra poque tb almacena jsons, pero siendo que a parte de almacenarlos tb hay que indexafrlos para buscar rapidamente entre tanto documento, se paso a elegir opensearch. con docker, ya que es la opcion que recomiendan ellos.
 me daba error con el docker el opensearch ultima version de 2.10... asi que busque por internet y era porque no era estabble. use la 1.2.3 y luego me dio un error que se resolvio? con pip install 'urllib3<2'.
 problema al almacenar campos por el limite de los index, porque al almacenar 10 documentos, ya son un total de 20000 campos.
+ya he arreglado eso y lo que he hecho ha sido serializar el body entero, de manera que el indice queda
+(paper_id, documento_serializado_entero). los tiempos que de momento manejo son los siguientes:
+
+tiempo de inserción de la carpeta_08 con 41 elementos, 122,4 MB:
+--- 59.84279656410217 seconds ---
+--- 778 insertados ---
+Además, esto ocupa 182,2 mb en opensearch
+
+segun ese dato, el calculo para el tiempo de insercion de la carpeta con mas documentos, que tiene 1275 elementos y 13.3 GB:
+122 ---- 1 minuto
+13300 ---- 109 minutos

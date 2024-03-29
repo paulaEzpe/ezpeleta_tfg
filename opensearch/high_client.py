@@ -18,6 +18,8 @@ import os
 import json
 import time 
 
+lista_carpetas_48 = ['00','02','04','06','08','10','12','14','16','18','20','22','97',\
+                     '01','03','05','07','09','11','13','15','17','19','21','93','98']
 
 #-----------------------------------------------------------------
 
@@ -233,8 +235,7 @@ def verificar_insercion_json_data(client, index_name, paper_id):
         documento_encontrado = hits[0]["_source"]
         # Verifica si el campo 'json_data' está presente en el documento
         if "json_data" in documento_encontrado:
-            #print("Contenido de 'json_data':", documento_encontrado["json_data"])
-            print("encontrado")
+            print("Contenido de 'json_data':", documento_encontrado["json_data"])
             return True
     return False
 
@@ -267,10 +268,10 @@ def imprimir_documentos_de_indice(client, index_name):
 def main1():
     client = conexion()
     index_name = "carpeta_08"
-    eliminar_indice(client, index_name)
-    response = crear_indice(index_name, client)
-    print(str(response))
-    insertar_carpeta("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset/08/", client, index_name)
+    # eliminar_indice(client, index_name)
+    # response = crear_indice(index_name, client)
+    # print(str(response))
+    #insertar_carpeta("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset/08/", client, index_name)
     #insertar_json(client, "prueba_i_1", "../datos/un_json.jsonl")
     #eliminar_documentos_indice(client, "indice_serializado")
     #insertar_json_serializado(client, index_name, "../datos/un_json.jsonl")
@@ -308,6 +309,6 @@ def main_eliminar():
 
 ############################################################
 
-main_eliminar()
+main1()
 
 

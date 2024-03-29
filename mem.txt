@@ -29,3 +29,4 @@ Además, esto ocupa 182,2 mb en opensearch
 segun ese dato, el calculo para el tiempo de insercion de la carpeta con mas documentos, que tiene 1275 elementos y 13.3 GB:
 122 ---- 1 minuto
 13300 ---- 109 minutos
+33600 ----- 300 aprox

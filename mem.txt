@@ -29,4 +29,12 @@ Además, esto ocupa 182,2 mb en opensearch
 segun ese dato, el calculo para el tiempo de insercion de la carpeta con mas documentos, que tiene 1275 elementos y 13.3 GB:
 122 ---- 1 minuto
 13300 ---- 109 minutos
-33600 ----- 300 aprox
+33600 ----- 300 minutos aprox
+
+para decidir si borrar e campo ref_entries de los jsons, ya que es un campo con el que nunca se va a trabajar y puede merecer la pena 
+borrarlo en cuanto a espacio "salvado" en opensearch, se ha extraido el campo de ref_entries de 778 documentos jsons
+y se han ido insertando el un archivo de texto. el tamaño de ese archivo es  333202, que entre los 778 documentos
+hace una media de 428.28020565552697 por documento. 
+
+ademas, hay que explicar lo de los autores que a veces en las referencias no salen en su propio campo
+sino que pueden aparecer en el nombre de la referencia. mirar ademas si el nombre de los autores tiene algun id o algo.

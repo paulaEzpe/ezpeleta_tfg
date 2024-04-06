@@ -14,7 +14,7 @@ collection = db["test"]
 
 # --------------------------------------
 def insertar_json (data_base, collection):
-    f = open("../datos/arXiv_src_2212_086.jsonl", "r")
+    f = open("../datos/arXiv_src_2201_009.jsonl", "r")
     datos = f.readlines()
 
     for line in datos:
@@ -27,7 +27,7 @@ def insertar_json (data_base, collection):
 # --------------------------------------
 
 def reventar_bd(data_base, collection):
-    f = open("../datos/arXiv_src_2212_086.jsonl", "r")
+    f = open("../datos/arXiv_src_2201_009.jsonl", "r")
     line = f.readline()
     line_json = json.loads(line)
     for i in range(1,5000):
@@ -45,10 +45,10 @@ def borrar_json (collection):
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
-    #borrar_json(collection)
-    #insertar_json(db, collection)
+    borrar_json(collection)
+    insertar_json(db, collection)
     #reventar_bd(db, collection) // ha llegado hasta 2600
-    collection.find().sort( [['_id', -1]]).limit(1)
+    #collection.find().sort( [['_id', -1]]).limit(1)
     print("All jsons correctly inserted")
 except Exception as e:
     print(e)

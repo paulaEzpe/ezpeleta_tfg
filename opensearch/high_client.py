@@ -91,6 +91,8 @@ def insertar_json_serializado(client, index_name, json_file):
 
 #-----------------------------------------------------------------
 
+#-----------------------------------------------------------------
+
 def obtener_numero_campos_ocupados(client, index_name):
     # Obtener el mapping del índice
     mapping = client.indices.get_mapping(index=index_name)
@@ -307,8 +309,12 @@ def main_eliminar():
     eliminar_indice(client, "carpeta_07")
     eliminar_indice(client, "solo")
 
+
+
+    
+
 ############################################################
 
-main1()
+main_info()
 
 

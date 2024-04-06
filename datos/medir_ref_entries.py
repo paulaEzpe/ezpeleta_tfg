@@ -10,8 +10,8 @@ def medir_carpeta(carpeta):
         print(f)
         nombre = carpeta + f 
         print(str(nombre))
-        contados += medir_tamano_ref_entries(nombre, "medir_ref_entries.txt")
-    print("contados" + str(contados))
+        contados += medir_tamano_ref_entries(nombre, "ref_entries.txt")
+    print("json con ref_entries contados: " + str(contados))
 
 
 

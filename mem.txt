@@ -33,8 +33,19 @@ segun ese dato, el calculo para el tiempo de insercion de la carpeta con mas doc
 
 para decidir si borrar e campo ref_entries de los jsons, ya que es un campo con el que nunca se va a trabajar y puede merecer la pena 
 borrarlo en cuanto a espacio "salvado" en opensearch, se ha extraido el campo de ref_entries de 778 documentos jsons
-y se han ido insertando el un archivo de texto. el tamaño de ese archivo es  333202, que entre los 778 documentos
+y se han ido insertando el un archivo de texto. el tamaño de ese archivo es  333202 bytes, que entre los 778 documentos
 hace una media de 428.28020565552697 por documento. 
 
 ademas, hay que explicar lo de los autores que a veces en las referencias no salen en su propio campo
-sino que pueden aparecer en el nombre de la referencia. mirar ademas si el nombre de los autores tiene algun id o algo.
+sino que pueden aparecer en el nombre de la referencia. mirar ademas si el nombre de los autores tiene algun id o algo (no tienen id, en el campo authors_parsed solo 
+aparecen los nombres y apellidos). y por que eliminar el campo de ref_entries?:
+
+    Tamaño total de la base de datos: Si la base de datos es pequeña o moderada, una reducción de 400 bytes por archivo podría no parecer significativa en términos absolutos. Sin embargo, en bases de datos más grandes, esta reducción puede sumar y tener un impacto considerable en el tamaño total de la base de datos.
+
+    Recursos del sistema: Si la base de datos se encuentra en un entorno con recursos limitados, como espacio en disco o ancho de banda, cualquier reducción en el tamaño de los archivos puede ser beneficiosa para optimizar el rendimiento y la eficiencia del sistema.
+
+    Velocidad de acceso y transferencia: Reducir el tamaño de los archivos puede mejorar la velocidad de acceso y transferencia de datos, especialmente en situaciones donde los recursos de red son limitados o el acceso a la base de datos se realiza a través de conexiones lentas.
+
+    Facilidad de mantenimiento: Menos datos pueden significar una menor complejidad y un mantenimiento más fácil de la base de datos. Esto puede ser particularmente útil si necesitas realizar copias de seguridad regulares de la base de datos o si estás gestionando la base de datos en un entorno de almacenamiento en la nube donde el costo está relacionado con la cantidad de datos almacenados.
+
+se ha decidido que se indexará por autores, paper_id, disciplina, categoría y título

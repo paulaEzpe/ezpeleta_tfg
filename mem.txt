@@ -49,3 +49,15 @@ aparecen los nombres y apellidos). y por que eliminar el campo de ref_entries?:
     Facilidad de mantenimiento: Menos datos pueden significar una menor complejidad y un mantenimiento más fácil de la base de datos. Esto puede ser particularmente útil si necesitas realizar copias de seguridad regulares de la base de datos o si estás gestionando la base de datos en un entorno de almacenamiento en la nube donde el costo está relacionado con la cantidad de datos almacenados.
 
 se ha decidido que se indexará por autores, paper_id, disciplina, categoría y título
+
+Data inserted successfully.
+--- 123.13113975524902 seconds ---
+--- 1327 insertados ---
+
+Data inserted successfully.
+--- 178.07762551307678 seconds ---
+--- 1596 insertados ---
+
+
+estaba teniendo problemas al buscar titulos porque buscaba un titulo que tecnicawmtne no estaba insertado y me salian muchos id, pero lo que pasaba
+era que estaba usando match en vez de term, que mira si coincide una parte de la cadena.

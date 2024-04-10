@@ -61,3 +61,14 @@ Data inserted successfully.
 
 estaba teniendo problemas al buscar titulos porque buscaba un titulo que tecnicawmtne no estaba insertado y me salian muchos id, pero lo que pasaba
 era que estaba usando match en vez de term, que mira si coincide una parte de la cadena.
+
+--- 1639.703936100006 seconds ---
+--- 15827 insertados ---
+
+Data inserted successfully.
+--- 6170.454500436783 seconds ---
+--- 58385 insertados --- esto la carpeta de 11.9 gb (100 minutos, casi 2h)
+
+Data inserted successfully.
+--- 10190.409915924072 seconds ---
+--- 65757 insertados ---

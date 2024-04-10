@@ -112,7 +112,10 @@ latexAccents = [
 
 
 lista_1 = ['02', '93', '00', '98', '01', '97', '03', '04', '05', '07', '06', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18']
-lista_2 = ['19', '20', '21', '22']
+lista_2 = ['19', '20']
+lista_3 = ['21']
+lista_4 = ['22']
+
 
 
 #-----------------------------------------------------------------
@@ -465,14 +468,14 @@ def buscar_papers_por_titulo(client, index_name, titulo_buscado):
 ###################################################
 
 
-def main_indexar():
-    client = conexion()
-    index_name = "indice_1"
-    # response = crear_indice(index_name, client)
-    # print(str(response))
-    insertar_carpeta(client, index_name, lista_1)
-    #insertar_carpeta("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset/17/", client, index_name)
-    #imprimir_numdoc_indice(index_name, client)
+# def main_indexar():
+#     client = conexion()
+#     index_name = "indice_1"
+#     # response = crear_indice(index_name, client)
+#     # print(str(response))
+#     insertar_carpeta(client, index_name, lista_4)
+#     #insertar_carpeta("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset/17/", client, index_name)
+#     #imprimir_numdoc_indice(index_name, client)
 
 def main_buscar():
     client = conexion()
@@ -484,7 +487,7 @@ def main_buscar():
     # print("Papers del autor '{}':".format(autor_buscado))
     # for paper_id in papers_del_autor:
     #     print(paper_id)
-    titulo_buscado = "Mechanism of the Resonant Enhancement of Electron Drift in Nanometre Semiconductor Superlattices Subjected to Electric and Inclined Magnetic Fields"
+    titulo_buscado = "Dark matter searches and energy accumulation and release in materials"
     # Llamada a la función buscar_papers_por_titulo
     papers_encontrados = buscar_papers_por_titulo(client, index_name, titulo_buscado)
     # Imprimir los IDs de los papers encontrados
@@ -495,16 +498,16 @@ def main_buscar():
     else:
         print("No se encontraron papers con el título '{}'.".format(titulo_buscado))
 
-def main_probar():
-    for carpeta_pequeña in lista_carpetas_48:
-        # Construir la ruta completa a la carpeta
-        carpeta_completa = os.path.join("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset", carpeta_pequeña)
-        files = [f for f in os.listdir(carpeta_completa)]
-        insertados = 0
-        print("Insertando documentos de la carpeta:", carpeta_pequeña)
-        for f in files:
-            nombre = os.path.join(carpeta_completa, f)
-            print(nombre)
+# def main_probar():
+#     for carpeta_pequeña in lista_carpetas_48:
+#         # Construir la ruta completa a la carpeta
+#         carpeta_completa = os.path.join("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset", carpeta_pequeña)
+#         files = [f for f in os.listdir(carpeta_completa)]
+#         insertados = 0
+#         print("Insertando documentos de la carpeta:", carpeta_pequeña)
+#         for f in files:
+#             nombre = os.path.join(carpeta_completa, f)
+#             print(nombre)
 
 
 ############################################################

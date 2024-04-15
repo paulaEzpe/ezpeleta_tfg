@@ -72,3 +72,13 @@ Data inserted successfully.
 Data inserted successfully.
 --- 10190.409915924072 seconds ---
 --- 65757 insertados ---
+
+
+
+--------------------------------------------------------------------------------
+
+con la del pdf que existe
+
+1º a nivel de interfaz que puedads llegar a acceder al json correspondiente, mediante meter el id o subir el pdf. si solo suber el id de archive voy a mostrarles yo el texto extrayendo el json y mostrandole el body text, o tambie que si me das el id de archive, me descago el pdf de archive (si se puede). que se pueda sleeccionar ua cit o un texto con unA cita
+
+2º de la seleccion del pdf, buscar la zona del body text con la referencia que estan seleccionando y extraer la referencia y mostrarla en un panel talcual esta en el json. sacar tambien ahi las referencias del json primigeneo (las que aparezcan en el parrafo). me traigo los jsons de las referencias

@@ -44,3 +44,33 @@
   margin-bottom: 10px;
   margin-left: 5px;
 }
+
+/* Estilos para el input dentro del accordion */
+.accordion-body {
+  padding: 10px;
+}
+
+.input-container {
+  margin-bottom: 10px;
+}
+
+.input-container input[type="text"] {
+  width: calc(100% - 90px);
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.input-container button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.input-container button:hover {
+  background-color: #0056b3;
+}

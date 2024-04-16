@@ -1,7 +1,7 @@
 from opensearchpy import OpenSearch
 from opensearch_dsl import Search
 from opensearch_dsl import Document, Text, Keyword
-from flask import Flask, request
+from flask import Flask, request, send_file
 import re
 import os
 import json
@@ -123,8 +123,8 @@ def upload_pdf_text():
 
 #-------------------------------------------------------------------------------------
 
-# Para recibir el input de la cuarta opcion del accordion
-@app.route("/uploadInputText", methods=["POST"])
+# Para descargar el pdf del id que mete el usuario
+@app.route("/uploadInputPdfId", methods=["POST"])
 def upload_input_text():
     data = request.json
     input_text = data.get('inputText')
@@ -133,9 +133,11 @@ def upload_input_text():
     else:
         # Mostrar el texto del input en la terminal
         print("Texto del input recibido:", input_text)
-        # Para descargar el pdf correspondiente al id que el usuario ha introducido
+        # Para descargar el pdf del input de arxiv
         descargar_pdf_arxiv(input_text, "../datos/")
-        return {"message": "Texto del input recibido y mostrado en la terminal."}
+        pdf_path = f"../datos/{input_text}.pdf"
+        return send_file(pdf_path, mimetype='application/pdf', as_attachment=False)
+
 
 #-------------------------------------------------------------------------------------
 

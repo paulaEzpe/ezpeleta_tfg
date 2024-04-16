@@ -19,6 +19,8 @@ function App() {
   const [viewPDF, setViewPDF] = useState(null);
   const [textInput, setTextInput] = useState('');
   const [selectedText, setSelectedText] = useState('');
+  const [downloadedPDF, setDownloadedPDF] = useState(null);
+
 
   // Función para finalizar la selección de texto en el pdf una vez el 
   // usuario ha dejado de hacer "click"
@@ -121,7 +123,7 @@ function App() {
 
   const handleInputSubmit = async () => {
     try {
-      const response = await fetch('/uploadInputText', {
+      const response = await fetch('/uploadInputPdfId', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ inputText: textInput })
@@ -131,6 +133,10 @@ function App() {
       console.error('Error al enviar el Input Text al backend:', error);
       throw error;
     }
+  };
+
+  const handleDownloadedPDF = (downloadedPDFUrl) => {
+    setDownloadedPDF(downloadedPDFUrl);
   };
 
   return (

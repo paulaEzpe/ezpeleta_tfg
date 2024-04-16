@@ -1,7 +1,7 @@
 from opensearchpy import OpenSearch
 from opensearch_dsl import Search
 from opensearch_dsl import Document, Text, Keyword
-from flask import Flask, request, send_file, jsonify, url_for, Response, redirect
+from flask import Flask, request, send_file, jsonify, url_for, Response, redirect, send_from_directory
 import re
 import os
 import json
@@ -13,6 +13,11 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route('/datos/<path:path>')
+def serve_pdf(path):
+    return send_from_directory('/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/web2/datos', path)
 
 index_name = "indice_1"
 
@@ -44,8 +49,10 @@ def descargar_pdf_arxiv(arxiv_id, directorio_destino):
         with open(ruta_pdf, 'wb') as f:
             f.write(response.content)
         print(f"PDF descargado correctamente: {ruta_pdf}")
+        return ruta_pdf  # Devuelve la ruta del PDF descargado
     else:
         print(f"No se pudo descargar el PDF. Código de estado: {response.status_code}")
+        return None  # Devuelve None si no se pudo descargar el PDF
 
 
 ################################## Gestiones con ElasticSearch ######################

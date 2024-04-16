@@ -121,6 +121,20 @@ function App() {
     }
   };
 
+  // const handleInputSubmit = async () => {
+  //   try {
+  //     const response = await fetch('/uploadInputPdfId', {
+  //       method: 'POST',
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: JSON.stringify({ inputText: textInput })
+  //     });
+  //     console.log('Input Text enviado al backend exitosamente.');
+  //   } catch (error) {
+  //     console.error('Error al enviar el Input Text al backend:', error);
+  //     throw error;
+  //   }
+  // };
+
   const handleInputSubmit = async () => {
     try {
       const response = await fetch('/uploadInputPdfId', {
@@ -128,12 +142,21 @@ function App() {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ inputText: textInput })
       });
-      console.log('Input Text enviado al backend exitosamente.');
+      if (response.ok) {
+        // Obtener la URL del PDF descargado desde el backend
+        const { pdfUrl } = await response.json();
+        // Establecer el PDF descargado en el estado
+        setDownloadedPDF(pdfUrl);
+        console.log('PDF descargado desde el backend:', pdfUrl);
+      } else {
+        console.error('Error al enviar el Input Text al backend:', response.statusText);
+      }
     } catch (error) {
       console.error('Error al enviar el Input Text al backend:', error);
       throw error;
     }
   };
+  
 
   const handleDownloadedPDF = (downloadedPDFUrl) => {
     setDownloadedPDF(downloadedPDFUrl);
@@ -170,12 +193,15 @@ function App() {
           </form>
           <h2 className="text-view">View PDF</h2>
           <div className='pdf-container'>
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
-              {viewPDF && <> 
-                <Viewer fileUrl={viewPDF} plugins={[defaultLayoutPluginInstance]}/>
-              </>}
-              {!viewPDF && <> No PDF</>}
-            </Worker>
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
+  {downloadedPDF && (
+    <Viewer fileUrl={downloadedPDF} plugins={[defaultLayoutPluginInstance]} />
+  )}
+  {!downloadedPDF && viewPDF && (
+    <Viewer fileUrl={viewPDF} plugins={[defaultLayoutPluginInstance]} />
+  )}
+  {!downloadedPDF && !viewPDF && <>No PDF</>}
+</Worker>
           </div>
         </div>
 

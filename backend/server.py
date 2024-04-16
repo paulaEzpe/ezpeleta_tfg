@@ -1,14 +1,18 @@
 from opensearchpy import OpenSearch
 from opensearch_dsl import Search
 from opensearch_dsl import Document, Text, Keyword
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify, url_for, Response, redirect
 import re
 import os
 import json
 import requests
+from io import BytesIO 
+from flask_cors import CORS
+
 
 
 app = Flask(__name__)
+CORS(app)
 
 index_name = "indice_1"
 
@@ -131,12 +135,15 @@ def upload_input_text():
     if input_text is None:
         return {"error": "No se proporcionó el texto del input"}, 400
     else:
-        # Mostrar el texto del input en la terminal
-        print("Texto del input recibido:", input_text)
-        # Para descargar el pdf del input de arxiv
-        descargar_pdf_arxiv(input_text, "../datos/")
-        pdf_path = f"../datos/{input_text}.pdf"
-        return send_file(pdf_path, mimetype='application/pdf', as_attachment=False)
+        # Descargar el PDF y obtener su ruta en el servidor
+        pdf_path = descargar_pdf_arxiv(input_text, "../datos/")
+        print("lo he descargadoi sin problemas")
+        if pdf_path:
+            # Devolver la ruta del PDF al cliente
+            print(pdf_path)
+            return {"pdfUrl": pdf_path}
+        else:
+            return {"error": "No se pudo descargar el PDF remoto"}, 500
 
 
 #-------------------------------------------------------------------------------------
@@ -154,6 +161,7 @@ def save_selected_text():
         return {"message": "Texto seleccionado recibido y mostrado en la terminal."}
 
 #------------------------------------------------------------------------------------
+
 
 if __name__ == "__main__":
     app.run(debug=True)

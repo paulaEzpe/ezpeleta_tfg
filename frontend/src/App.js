@@ -20,22 +20,34 @@ function App() {
   const [textInput, setTextInput] = useState('');
   const [selectedText, setSelectedText] = useState('');
 
+  // Función para finalizar la selección de texto en el pdf una vez el 
+  // usuario ha dejado de hacer "click"
   useEffect(() => {
-    const handleSelection = () => {
+    let selectedText = '';
+
+    const handleSelectionChange = () => {
       const selection = window.getSelection();
-      if (selection.toString().length > 0) {
-        setSelectedText(selection.toString());
+      selectedText = selection.toString();
+    };
+
+    const handleMouseUp = () => {
+      if (selectedText.length > 0) {
+        setSelectedText(selectedText);
         // Enviar texto seleccionado al servidor
-        sendSelectedTextToBackend(selection.toString());
+        sendSelectedTextToBackend(selectedText);
       }
     };
 
-    document.addEventListener('selectionchange', handleSelection);
+    document.addEventListener('selectionchange', handleSelectionChange);
+    document.addEventListener('mouseup', handleMouseUp);
 
     return () => {
-      document.removeEventListener('selectionchange', handleSelection);
+      document.removeEventListener('selectionchange', handleSelectionChange);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
+
+
 
   async function sendSelectedTextToBackend(selectedText) {
       try {
@@ -136,8 +148,8 @@ function App() {
                 <div id="collapseFour" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
                   <div className="accordion-body">
                     <div className="input-container">
-                      <input type="text" className="form-control" value={textInput} onChange={handleTextInputChange} />
-                      <button type="button" className="btn btn-primary" onClick={handleInputSubmit}>Enviar al Backend</button>
+                      <input type="text" className="form-control" placeholder="Introduzca ID del paper en Arxiv" value={textInput} onChange={handleTextInputChange} />
+                      <button type="button" className="btn btn-primary" onClick={handleInputSubmit}>Submit paper</button>
                     </div>
                   </div>
                 </div>

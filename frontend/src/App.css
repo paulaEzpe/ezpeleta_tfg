@@ -64,7 +64,7 @@
 
 .input-container button {
   padding: 5px 10px;
-  background-color: #007bff;
+  background-color: #1f66b3;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -72,5 +72,10 @@
 }
 
 .input-container button:hover {
-  background-color: #0056b3;
+  background-color: #4196f1;
+}
+
+.btn {
+  margin-top: 10px; /* Puedes ajustar los valores según sea necesario */
+  margin-left: 5px;
 }

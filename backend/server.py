@@ -148,6 +148,13 @@ def upload_input_text():
         if pdf_path:
             # Devolver la ruta del PDF al cliente
             print(pdf_path)
+            client = conexion()
+            verificar_conexion(client)
+            titulo = obtener_titulo_por_paper_id(client, index_name, input_text) #buscarlo en opensearch por id del paper
+            if titulo is not None:
+                print("Título del documento encontrado:", titulo)
+            else:
+                print("No se encontró ningún documento con el paper_id dado.")
             return {"pdfUrl": pdf_path}
         else:
             return {"error": "No se pudo descargar el PDF remoto"}, 500

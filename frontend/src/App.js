@@ -36,7 +36,8 @@ function App() {
       if (selectedText.length > 0) {
         setSelectedText(selectedText);
         // Enviar texto seleccionado al servidor
-        sendSelectedTextToBackend(selectedText);
+        //mostrar el texto en el recuadro
+        //sendSelectedTextToBackend(selectedText);
       }
     };
 
@@ -51,7 +52,7 @@ function App() {
 
 
 
-  async function sendSelectedTextToBackend(selectedText) {
+  async function sendSelectedTextToBackend() {
       try {
           const response = await fetch('/uploadSelectedText', {
               method: 'POST',
@@ -71,6 +72,7 @@ function App() {
   const fileType = ['application/pdf'];
 
   const handleChange = (e) => {
+    setPDFFile(null);
     let selectedFile = e.target.files[0];
     if(selectedFile) {
       if(selectedFile && fileType.includes(selectedFile.type)) {
@@ -94,6 +96,7 @@ function App() {
   };
 
   const handlePDFSubmit = async (e) => {
+    setViewPDF(null)
     e.preventDefault();
     if (pdfFile !== null) {
       try {
@@ -178,7 +181,16 @@ function App() {
                   <div className="accordion-body">
                     <div className="input-container">
                       <input type="text" className="form-control" placeholder="Introduzca ID del paper en Arxiv" value={textInput} onChange={handleTextInputChange} />
-                      <button type="button" className="btn btn-primary" onClick={handleInputSubmit}>Submit paper</button>
+                      <button type="button" className="btn btn-primary" onClick={ () => handleInputSubmit()}>Submit paper</button>
+                    </div>
+                    <div className="input-container2">
+                      <h4>Texto seleccionado</h4>
+                      {/* Cuadro de entrada de texto de solo lectura */}
+                      <textarea className="form-control mt-2 w-100" style={{ 
+                        height: '300px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
+                        msOverflowStyle: 'none' /* For Internet Explorer and Edge */}}  value={selectedText} readOnly 
+                      />
+                      <button type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()}>Analizar cita</button>
                     </div>
                   </div>
                 </div>
@@ -193,15 +205,15 @@ function App() {
           </form>
           <h2 className="text-view">View PDF</h2>
           <div className='pdf-container'>
-          <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
-  {downloadedPDF && (
-    <Viewer fileUrl={downloadedPDF} plugins={[defaultLayoutPluginInstance]} />
-  )}
-  {!downloadedPDF && viewPDF && (
-    <Viewer fileUrl={viewPDF} plugins={[defaultLayoutPluginInstance]} />
-  )}
-  {!downloadedPDF && !viewPDF && <>No PDF</>}
-</Worker>
+            <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
+              {downloadedPDF && (
+                <Viewer fileUrl={downloadedPDF} plugins={[defaultLayoutPluginInstance]} />
+              )}
+              {!downloadedPDF && viewPDF && (
+                <Viewer fileUrl={viewPDF} plugins={[defaultLayoutPluginInstance]} />
+              )}
+              {!downloadedPDF && !viewPDF && <>No PDF</>}
+            </Worker>
           </div>
         </div>
 

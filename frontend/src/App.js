@@ -192,6 +192,14 @@ function App() {
                       />
                       <button type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()}>Analizar cita</button>
                     </div>
+                    <div className="input-container3">
+                      <h6>Referencias bibliográficas encontradas en el párrafo del texto seleccionado</h6>
+                      {/* Cuadro de entrada de texto de solo lectura */}
+                      <textarea className="form-control mt-2 w-100" style={{ 
+                        height: '200px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
+                        msOverflowStyle: 'none' /* For Internet Explorer and Edge */}} readOnly 
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

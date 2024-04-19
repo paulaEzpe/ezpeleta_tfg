@@ -479,6 +479,8 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
 
     # Acceder al campo body_text del documento original
     body_text = documento_original["body_text"]
+    # cojo las referencias de las citas del documento original
+    bibliografia = documento_original["bib_entries"]
 
     contiene_cita = False
 
@@ -489,27 +491,33 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
         texto = obj["text"]
         # cojo las citas del parrafo
         citas = obj["cite_spans"]
+
         texto_parrafo_limpio = limpiar_texto(texto)
         texto_parrafo = ' '.join(texto_parrafo_limpio)
-        # if "nonrelativistic" in texto_parrafo_limpio:
-        #     print("Texto del parrafo: ", texto_parrafo_limpio)
         
         if all(palabra in texto_parrafo_limpio for palabra in texto_cita_limpio):
             contiene_cita = True
-            #print("El parrafo: " + texto + "contiene la cita: " + cita)
             break
+
     if contiene_cita:
         print("El string está presente en al menos uno de los objetos body_text.")
-        # si contiene la cita, imprimo todas las referencias del parrafo
-        for cita in citas:
-            ref_id = cita["ref_id"]
-            print("Referencia ID:", ref_id)
+        # si contiene la cita, extraigo las citas del parrafo correspondiente al texto que ha seleccionado el usuario
+        citas_seleccionadas = extraer_citas(texto)
+        # ahora en citas_seleccionadas, estan las citas que ha seleccionado el usuario al seleccionar texto en el párrafo
+        #ahora las contrasto con las citas que aparecen en el parrfo correspondiente a la seleccion
+        for cita in citas_seleccionadas:
+            # Obtener el identificador de la cita
+            identificador = cita.split(":")[1].split("}")[0]
+            if any(identificador == span["ref_id"] for span in obj["cite_spans"]):
+                print(f"Cita {{cite:{identificador}}}")
+                # en caso de que exista, hay que ir a buscarla a las referencias
+                bibliografia_raw = bibliografia[identificador]["bib_entry_raw"]
+                print("Bibliografía:", bibliografia_raw)
+            else:
+                print(f"La cita {{cite:{cita}}} no coincide con ninguna cita en obj.")
     else:
         print("El string no está presente en ningún objeto body_text.")
-        # texto_parrafo = ' '.join(texto_parrafo_limpio)
-        # texto_cita = ' '.join(texto_cita_limpio)
-        # print("Texto del parrafo: ", texto_parrafo_limpio)
-        # print("Texto de la cita:", texto_cita_limpio)
+        
         
 
 #-----------------------------------------------------
@@ -526,6 +534,13 @@ def limpiar_texto(texto):
 
 #---------------------------------------------------------
 
+def extraer_citas(texto):
+    # Expresión regular para encontrar citas
+    patron = r'\{\{cite:[^\}]+\}\}'
+    # Encontrar todas las coincidencias de la expresión regular en el texto
+    citas_encontradas = re.findall(patron, texto)
+    # Retornar las citas encontradas
+    return citas_encontradas
 
 
 ###################################################

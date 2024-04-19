@@ -20,8 +20,17 @@ def serve_pdf(path):
     return send_from_directory('/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/web2/datos', path)
 
 index_name = "indice_1"
+paper_id = ""
 
 #################################### Funciones ####################################
+
+def modify_global_variable_paper_id(nuevo_articulo):
+    # Indicar que se va a modificar la variable global
+    global paper_id
+    # Modificar la variable global
+    paper_id = nuevo_articulo
+
+#--------------------------------------------------------------------------------
 
 # Para extraer el paper_id del pdf de archive que busquemos
 def extraer_arxiv(texto):
@@ -35,6 +44,29 @@ def extraer_arxiv(texto):
         return None 
 
 #-------------------------------------------------------------------------------------
+
+def limpiar_texto(texto):
+    # Eliminar secuencias de números y letras seguidos
+    texto_limpio = re.sub(r'\b\w+\d+\w*\b', '', texto.lower())
+    # Eliminar caracteres no alfanuméricos y convertir a minúsculas
+    texto_limpio = re.sub(r'[^\w\s]', '', texto_limpio)
+    # Dividir el texto en palabras
+    palabras = texto_limpio.split()
+    return palabras
+
+
+#---------------------------------------------------------
+
+def extraer_citas(texto):
+    # Expresión regular para encontrar citas
+    patron = r'\{\{cite:[^\}]+\}\}'
+    # Encontrar todas las coincidencias de la expresión regular en el texto
+    citas_encontradas = re.findall(patron, texto)
+    # Retornar las citas encontradas
+    return citas_encontradas
+
+
+#-------------------------------------------------------------------------------
 
 def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, cita):
     consulta = {"query": {"match": {"paper_id": paper_id}}}   
@@ -51,6 +83,8 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
 
     # Acceder al campo body_text del documento original
     body_text = documento_original["body_text"]
+    # cojo las referencias de las citas del documento original
+    bibliografia = documento_original["bib_entries"]
 
     contiene_cita = False
 
@@ -61,27 +95,32 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
         texto = obj["text"]
         # cojo las citas del parrafo
         citas = obj["cite_spans"]
+
         texto_parrafo_limpio = limpiar_texto(texto)
         texto_parrafo = ' '.join(texto_parrafo_limpio)
-        # if "nonrelativistic" in texto_parrafo_limpio:
-        #     print("Texto del parrafo: ", texto_parrafo_limpio)
         
         if all(palabra in texto_parrafo_limpio for palabra in texto_cita_limpio):
             contiene_cita = True
-            #print("El parrafo: " + texto + "contiene la cita: " + cita)
             break
+
     if contiene_cita:
         print("El string está presente en al menos uno de los objetos body_text.")
-        # si contiene la cita, imprimo todas las referencias del parrafo
-        for cita in citas:
-            ref_id = cita["ref_id"]
-            print("Referencia ID:", ref_id)
+        # si contiene la cita, extraigo las citas del parrafo correspondiente al texto que ha seleccionado el usuario
+        citas_seleccionadas = extraer_citas(texto)
+        # ahora en citas_seleccionadas, estan las citas que ha seleccionado el usuario al seleccionar texto en el párrafo
+        #ahora las contrasto con las citas que aparecen en el parrfo correspondiente a la seleccion
+        for cita in citas_seleccionadas:
+            # Obtener el identificador de la cita
+            identificador = cita.split(":")[1].split("}")[0]
+            if any(identificador == span["ref_id"] for span in obj["cite_spans"]):
+                print(f"Cita {{cite:{identificador}}}")
+                # en caso de que exista, hay que ir a buscarla a las referencias
+                bibliografia_raw = bibliografia[identificador]["bib_entry_raw"]
+                print("Bibliografía:", bibliografia_raw)
+            else:
+                print(f"La cita {{cite:{cita}}} no coincide con ninguna cita en obj.")
     else:
         print("El string no está presente en ningún objeto body_text.")
-        # texto_parrafo = ' '.join(texto_parrafo_limpio)
-        # texto_cita = ' '.join(texto_cita_limpio)
-        # print("Texto del parrafo: ", texto_parrafo_limpio)
-        # print("Texto de la cita:", texto_cita_limpio)
 
 #--------------------------------------------------------------------------------------
 
@@ -93,6 +132,7 @@ def descargar_pdf_arxiv(arxiv_id, directorio_destino):
     # Descarga el PDF
     response = requests.get(url_pdf)
     if response.status_code == 200:
+        
         # Guarda el PDF en el directorio especificado
         ruta_pdf = os.path.join(directorio_destino, f"{arxiv_id}.pdf")
         with open(ruta_pdf, 'wb') as f:
@@ -166,8 +206,9 @@ def upload_pdf_text():
         return {"error": "No se proporcionó el texto del PDF"}, 400
     else:
         # Buscar el documento en elasticsearch
-        paper_id = extraer_arxiv(pdf_text)
-        print(paper_id)
+        #paper_id = extraer_arxiv(pdf_text)
+        modify_global_variable_paper_id(extraer_arxiv(pdf_text))
+        print("Id del documento subido:", paper_id)
         client = conexion()
         verificar_conexion(client)
         titulo = obtener_titulo_por_paper_id(client, index_name, paper_id)
@@ -192,14 +233,17 @@ def upload_input_text():
         return {"error": "No se proporcionó el texto del input"}, 400
     else:
         # Descargar el PDF y obtener su ruta en el servidor
-        pdf_path = descargar_pdf_arxiv(input_text, "../datos/")
+        #paper_id=input_text
+        modify_global_variable_paper_id(input_text)
+        print("Id del documento buscado y descargado:", paper_id)
+        pdf_path = descargar_pdf_arxiv(paper_id, "../datos/")
         print("lo he descargadoi sin problemas")
         if pdf_path:
             # Devolver la ruta del PDF al cliente
             print(pdf_path)
             client = conexion()
             verificar_conexion(client)
-            titulo = obtener_titulo_por_paper_id(client, index_name, input_text) #buscarlo en opensearch por id del paper
+            titulo = obtener_titulo_por_paper_id(client, index_name, paper_id) #buscarlo en opensearch por id del paper
             if titulo is not None:
                 print("Título del documento encontrado:", titulo)
             else:
@@ -220,9 +264,15 @@ def save_selected_text():
         return {"error": "No se proporcionó texto seleccionado"}, 400
     else:
         # Mostrar el texto seleccionado en la terminal
+        print("Paper_id ultimo obtenido: ", paper_id)
         print('Texto seleccionado:', selected_text)
+        client = conexion()
+        #verificar_conexion(client)
+        #es necesario obtener el id del paper que esta siendo seleccionado, asi que cojo el de la variable global, que será el que se esté visualizando
+        obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, selected_text)
         return {"message": "Texto seleccionado recibido y mostrado en la terminal."}
         # Aqui ahora hay que hacer lo de mostrar las citas, que ya está la función hecha
+        
 
 #------------------------------------------------------------------------------------
 

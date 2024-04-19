@@ -462,6 +462,69 @@ def buscar_papers_por_titulo(client, index_name, titulo_buscado):
 
     return ids_papers
 
+#---------------------------------------------------------
+
+def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, cita):
+    consulta = {"query": {"match": {"paper_id": paper_id}}}   
+    # Realizar la consulta para obtener el documento específico
+    resultado = client.search(index=index_name, body=consulta)
+    # Obtener el documento específico de los resultados
+    documento_especifico = resultado["hits"]["hits"][0]["_source"]
+
+    # Acceder al campo json_data para obtener el documento serializado
+    documento_serializado = documento_especifico["json_data"]
+
+    # Deserializar el documento serializado para obtener el documento original
+    documento_original = json.loads(documento_serializado)
+
+    # Acceder al campo body_text del documento original
+    body_text = documento_original["body_text"]
+
+    contiene_cita = False
+
+    texto_cita_limpio = limpiar_texto(cita)
+
+    for obj in body_text:
+        # cojo el parrafo
+        texto = obj["text"]
+        # cojo las citas del parrafo
+        citas = obj["cite_spans"]
+        texto_parrafo_limpio = limpiar_texto(texto)
+        texto_parrafo = ' '.join(texto_parrafo_limpio)
+        # if "nonrelativistic" in texto_parrafo_limpio:
+        #     print("Texto del parrafo: ", texto_parrafo_limpio)
+        
+        if all(palabra in texto_parrafo_limpio for palabra in texto_cita_limpio):
+            contiene_cita = True
+            #print("El parrafo: " + texto + "contiene la cita: " + cita)
+            break
+    if contiene_cita:
+        print("El string está presente en al menos uno de los objetos body_text.")
+        # si contiene la cita, imprimo todas las referencias del parrafo
+        for cita in citas:
+            ref_id = cita["ref_id"]
+            print("Referencia ID:", ref_id)
+    else:
+        print("El string no está presente en ningún objeto body_text.")
+        # texto_parrafo = ' '.join(texto_parrafo_limpio)
+        # texto_cita = ' '.join(texto_cita_limpio)
+        # print("Texto del parrafo: ", texto_parrafo_limpio)
+        # print("Texto de la cita:", texto_cita_limpio)
+        
+
+#-----------------------------------------------------
+
+def limpiar_texto(texto):
+    # Eliminar secuencias de números y letras seguidos
+    texto_limpio = re.sub(r'\b\w+\d+\w*\b', '', texto.lower())
+    # Eliminar caracteres no alfanuméricos y convertir a minúsculas
+    texto_limpio = re.sub(r'[^\w\s]', '', texto_limpio)
+    # Dividir el texto en palabras
+    palabras = texto_limpio.split()
+    return palabras
+
+
+#---------------------------------------------------------
 
 
 
@@ -480,6 +543,7 @@ def buscar_papers_por_titulo(client, index_name, titulo_buscado):
 def main_buscar():
     client = conexion()
     index_name = "indice_1"
+    obtener_body_documento_y_comparar_string_presente(client, index_name, "2201.01489", "The quark model calculations in the S01 partial wave, nonrelativistic or relativistic")
     #verificar_insercion_titulo(client, index_name, "Law of Iterated Logarithms and Fractal Properties of the KPZ Equation")
     #verificar_insercion_autor(client, index_name, "Sayan Das")
     # autor_buscado = "Sayan Das"
@@ -487,16 +551,18 @@ def main_buscar():
     # print("Papers del autor '{}':".format(autor_buscado))
     # for paper_id in papers_del_autor:
     #     print(paper_id)
-    titulo_buscado = "Dark matter searches and energy accumulation and release in materials"
-    # Llamada a la función buscar_papers_por_titulo
-    papers_encontrados = buscar_papers_por_titulo(client, index_name, titulo_buscado)
-    # Imprimir los IDs de los papers encontrados
-    if papers_encontrados:
-        print("Papers encontrados con el título '{}':".format(titulo_buscado))
-        for paper_id in papers_encontrados:
-            print(paper_id)
-    else:
-        print("No se encontraron papers con el título '{}'.".format(titulo_buscado))
+    # titulo_buscado = "Dark matter searches and energy accumulation and release in materials"
+    # # Llamada a la función buscar_papers_por_titulo
+    # papers_encontrados = buscar_papers_por_titulo(client, index_name, titulo_buscado)
+    # # Imprimir los IDs de los papers encontrados
+    # if papers_encontrados:
+    #     print("Papers encontrados con el título '{}':".format(titulo_buscado))
+    #     for paper_id in papers_encontrados:
+    #         print(paper_id)
+    # else:
+    #     print("No se encontraron papers con el título '{}'.".format(titulo_buscado))
+
+#---------------------------------------------------------------
 
 # def main_probar():
 #     for carpeta_pequeña in lista_carpetas_48:

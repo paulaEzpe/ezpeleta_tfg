@@ -34,6 +34,55 @@ def extraer_arxiv(texto):
     else:
         return None 
 
+#-------------------------------------------------------------------------------------
+
+def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, cita):
+    consulta = {"query": {"match": {"paper_id": paper_id}}}   
+    # Realizar la consulta para obtener el documento específico
+    resultado = client.search(index=index_name, body=consulta)
+    # Obtener el documento específico de los resultados
+    documento_especifico = resultado["hits"]["hits"][0]["_source"]
+
+    # Acceder al campo json_data para obtener el documento serializado
+    documento_serializado = documento_especifico["json_data"]
+
+    # Deserializar el documento serializado para obtener el documento original
+    documento_original = json.loads(documento_serializado)
+
+    # Acceder al campo body_text del documento original
+    body_text = documento_original["body_text"]
+
+    contiene_cita = False
+
+    texto_cita_limpio = limpiar_texto(cita)
+
+    for obj in body_text:
+        # cojo el parrafo
+        texto = obj["text"]
+        # cojo las citas del parrafo
+        citas = obj["cite_spans"]
+        texto_parrafo_limpio = limpiar_texto(texto)
+        texto_parrafo = ' '.join(texto_parrafo_limpio)
+        # if "nonrelativistic" in texto_parrafo_limpio:
+        #     print("Texto del parrafo: ", texto_parrafo_limpio)
+        
+        if all(palabra in texto_parrafo_limpio for palabra in texto_cita_limpio):
+            contiene_cita = True
+            #print("El parrafo: " + texto + "contiene la cita: " + cita)
+            break
+    if contiene_cita:
+        print("El string está presente en al menos uno de los objetos body_text.")
+        # si contiene la cita, imprimo todas las referencias del parrafo
+        for cita in citas:
+            ref_id = cita["ref_id"]
+            print("Referencia ID:", ref_id)
+    else:
+        print("El string no está presente en ningún objeto body_text.")
+        # texto_parrafo = ' '.join(texto_parrafo_limpio)
+        # texto_cita = ' '.join(texto_cita_limpio)
+        # print("Texto del parrafo: ", texto_parrafo_limpio)
+        # print("Texto de la cita:", texto_cita_limpio)
+
 #--------------------------------------------------------------------------------------
 
 # Para descargarme el pdf correspondiente cuando solo me pasan el id del paper por el input
@@ -173,6 +222,7 @@ def save_selected_text():
         # Mostrar el texto seleccionado en la terminal
         print('Texto seleccionado:', selected_text)
         return {"message": "Texto seleccionado recibido y mostrado en la terminal."}
+        # Aqui ahora hay que hacer lo de mostrar las citas, que ya está la función hecha
 
 #------------------------------------------------------------------------------------
 

@@ -20,6 +20,7 @@ function App() {
   const [textInput, setTextInput] = useState('');
   const [selectedText, setSelectedText] = useState('');
   const [downloadedPDF, setDownloadedPDF] = useState(null);
+  const [bibliographyText, setBibliographyText] = useState('');
 
 
   // Función para finalizar la selección de texto en el pdf una vez el 
@@ -64,9 +65,25 @@ function App() {
           } else {
               console.error('Error al enviar el texto seleccionado al backend.');
           }
+          await fetchReceivedTextFromBackend();
       } catch (error) {
           console.error('Error al enviar el texto seleccionado al backend:', error);
       }
+  }
+
+  // para recibir del backend la bibliografía correspondiente al parrafo al que pertenece el texto seleccionado por el usuario
+  async function fetchReceivedTextFromBackend() {
+    try {
+        const response = await fetch('/getReceivedText');
+        if (response.ok) {
+            const data = await response.json();
+            setBibliographyText(data.bibliographyText);
+        } else {
+            console.error('Error al obtener el texto del backend.');
+        }
+    } catch (error) {
+        console.error('Error al obtener el texto del backend:', error);
+    }
   }
 
   const fileType = ['application/pdf'];
@@ -197,7 +214,8 @@ function App() {
                       {/* Cuadro de entrada de texto de solo lectura */}
                       <textarea className="form-control mt-2 w-100" style={{ 
                         height: '200px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
-                        msOverflowStyle: 'none' /* For Internet Explorer and Edge */}} readOnly 
+                        msOverflowStyle: 'none' /* For Internet Explorer and Edge */}} value={bibliographyText}
+                        onChange={handleTextInputChange} readOnly 
                       />
                     </div>
                   </div>

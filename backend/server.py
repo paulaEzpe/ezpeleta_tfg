@@ -87,6 +87,7 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
     bibliografia = documento_original["bib_entries"]
 
     contiene_cita = False
+    bibliografia_completa = ""  # Inicializar el string de la bibliografía
 
     texto_cita_limpio = limpiar_texto(cita)
 
@@ -104,7 +105,7 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
             break
 
     if contiene_cita:
-        print("El string está presente en al menos uno de los objetos body_text.")
+        bibliografia_completa = ""  # Inicializar el string de la bibliografía
         # si contiene la cita, extraigo las citas del parrafo correspondiente al texto que ha seleccionado el usuario
         citas_seleccionadas = extraer_citas(texto)
         # ahora en citas_seleccionadas, estan las citas que ha seleccionado el usuario al seleccionar texto en el párrafo
@@ -113,14 +114,18 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
             # Obtener el identificador de la cita
             identificador = cita.split(":")[1].split("}")[0]
             if any(identificador == span["ref_id"] for span in obj["cite_spans"]):
-                print(f"Cita {{cite:{identificador}}}")
+                # Construir el string de la bibliografía
+                bibliografia_completa += f"Cita {{cite:{identificador}}}\n"
                 # en caso de que exista, hay que ir a buscarla a las referencias
                 bibliografia_raw = bibliografia[identificador]["bib_entry_raw"]
-                print("Bibliografía:", bibliografia_raw)
+                bibliografia_completa += f"Bibliografía: {bibliografia_raw}\n\n"
             else:
-                print(f"La cita {{cite:{cita}}} no coincide con ninguna cita en obj.")
+                bibliografia_completa += f"La cita {{cite:{cita}}} no coincide con ninguna cita en obj.\n"
     else:
-        print("El string no está presente en ningún objeto body_text.")
+        bibliografia_completa = "El string no está presente en ningún objeto body_text."
+
+    return bibliografia_completa
+
 
 #--------------------------------------------------------------------------------------
 
@@ -269,10 +274,25 @@ def save_selected_text():
         client = conexion()
         #verificar_conexion(client)
         #es necesario obtener el id del paper que esta siendo seleccionado, asi que cojo el de la variable global, que será el que se esté visualizando
-        obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, selected_text)
-        return {"message": "Texto seleccionado recibido y mostrado en la terminal."}
+        bibliografia = obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, selected_text)
+        print("La bibliografia completa es: ", bibliografia)
+        return bibliografia
         # Aqui ahora hay que hacer lo de mostrar las citas, que ya está la función hecha
         
+
+#------------------------------------------------------------------------------------
+
+# para enviar al frontend la bibliografia obtenida con la funcion obtener_body_documento_y_comparar_string_presente
+@app.route('/getReceivedText', methods=['GET'])
+def get_received_text():
+    # Aquí recupera el texto procesado anteriormente, por ejemplo, de la base de datos
+    # Luego envía el texto al frontend
+    bibliografia = save_selected_text()
+    print("la biblio es: ", bibliografia)
+    print('Solicitud GET recibida en /getReceivedText')
+    response = jsonify({'bibliographyText': bibliografia})
+    response.headers.add('Content-Type', 'application/json')  # Establecer el encabezado Content-Type
+    return response, 200
 
 #------------------------------------------------------------------------------------
 

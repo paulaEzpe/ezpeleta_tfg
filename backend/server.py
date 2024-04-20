@@ -284,7 +284,7 @@ def save_selected_text():
         client = conexion()
         # Obtener la bibliografía
         bibliografia_obtenida = obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, selected_text)
-        print("La bibliografía completa es: ", bibliografia_obtenida)
+        # print("La bibliografía completa es: ", bibliografia_obtenida)
         # Modificar la variable global de bibliografía
         modify_global_variable_bibliografia(bibliografia_obtenida)
         # Devolver una respuesta indicando que la acción se ha completado correctamente

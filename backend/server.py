@@ -21,6 +21,7 @@ def serve_pdf(path):
 
 index_name = "indice_1"
 paper_id = ""
+bibliografia = ""
 
 #################################### Funciones ####################################
 
@@ -29,6 +30,14 @@ def modify_global_variable_paper_id(nuevo_articulo):
     global paper_id
     # Modificar la variable global
     paper_id = nuevo_articulo
+
+#---------------------------------------------------------------------------------
+
+def modify_global_variable_bibliografia(biblio):
+    # Indicar que se va a modificar la variable global
+    global bibliografia
+    # Modificar la variable global
+    bibliografia = biblio
 
 #--------------------------------------------------------------------------------
 
@@ -105,6 +114,7 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
             break
 
     if contiene_cita:
+        #print(texto)
         bibliografia_completa = ""  # Inicializar el string de la bibliografía
         # si contiene la cita, extraigo las citas del parrafo correspondiente al texto que ha seleccionado el usuario
         citas_seleccionadas = extraer_citas(texto)
@@ -215,7 +225,7 @@ def upload_pdf_text():
         modify_global_variable_paper_id(extraer_arxiv(pdf_text))
         print("Id del documento subido:", paper_id)
         client = conexion()
-        verificar_conexion(client)
+        #verificar_conexion(client)
         titulo = obtener_titulo_por_paper_id(client, index_name, paper_id)
         if titulo is not None:
             print("Título del documento encontrado:", titulo)
@@ -247,7 +257,7 @@ def upload_input_text():
             # Devolver la ruta del PDF al cliente
             print(pdf_path)
             client = conexion()
-            verificar_conexion(client)
+            #verificar_conexion(client)
             titulo = obtener_titulo_por_paper_id(client, index_name, paper_id) #buscarlo en opensearch por id del paper
             if titulo is not None:
                 print("Título del documento encontrado:", titulo)
@@ -272,27 +282,24 @@ def save_selected_text():
         print("Paper_id ultimo obtenido: ", paper_id)
         print('Texto seleccionado:', selected_text)
         client = conexion()
-        #verificar_conexion(client)
-        #es necesario obtener el id del paper que esta siendo seleccionado, asi que cojo el de la variable global, que será el que se esté visualizando
-        bibliografia = obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, selected_text)
-        print("La bibliografia completa es: ", bibliografia)
-        return bibliografia
-        # Aqui ahora hay que hacer lo de mostrar las citas, que ya está la función hecha
+        # Obtener la bibliografía
+        bibliografia_obtenida = obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, selected_text)
+        print("La bibliografía completa es: ", bibliografia_obtenida)
+        # Modificar la variable global de bibliografía
+        modify_global_variable_bibliografia(bibliografia_obtenida)
+        # Devolver una respuesta indicando que la acción se ha completado correctamente
+        return {"message": "Bibliografia guardada correctamente"}, 200
+
         
 
 #------------------------------------------------------------------------------------
 
 # para enviar al frontend la bibliografia obtenida con la funcion obtener_body_documento_y_comparar_string_presente
-@app.route('/getReceivedText', methods=['GET'])
+@app.route('/getBibliography', methods=['GET'])
 def get_received_text():
     # Aquí recupera el texto procesado anteriormente, por ejemplo, de la base de datos
     # Luego envía el texto al frontend
-    bibliografia = save_selected_text()
-    print("la biblio es: ", bibliografia)
-    print('Solicitud GET recibida en /getReceivedText')
-    response = jsonify({'bibliographyText': bibliografia})
-    response.headers.add('Content-Type', 'application/json')  # Establecer el encabezado Content-Type
-    return response, 200
+    return bibliografia
 
 #------------------------------------------------------------------------------------
 

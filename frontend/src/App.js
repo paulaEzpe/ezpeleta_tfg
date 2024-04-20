@@ -36,9 +36,9 @@ function App() {
     const handleMouseUp = () => {
       if (selectedText.length > 0) {
         setSelectedText(selectedText);
+        setBibliographyText('');
         // Enviar texto seleccionado al servidor
         //mostrar el texto en el recuadro
-        //sendSelectedTextToBackend(selectedText);
       }
     };
 
@@ -55,6 +55,9 @@ function App() {
 
   async function sendSelectedTextToBackend() {
       try {
+          // prueba
+          setBibliographyText('');
+          setTextInput('');
           const response = await fetch('/uploadSelectedText', {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
@@ -65,30 +68,33 @@ function App() {
           } else {
               console.error('Error al enviar el texto seleccionado al backend.');
           }
-          await fetchReceivedTextFromBackend();
+          await fetchBibliographyFromBackend();
       } catch (error) {
           console.error('Error al enviar el texto seleccionado al backend:', error);
       }
   }
 
   // para recibir del backend la bibliografía correspondiente al parrafo al que pertenece el texto seleccionado por el usuario
-  async function fetchReceivedTextFromBackend() {
+  async function fetchBibliographyFromBackend() {
     try {
-        const response = await fetch('/getReceivedText');
+        const response = await fetch('/getBibliography');
         if (response.ok) {
-            const data = await response.json();
-            setBibliographyText(data.bibliographyText);
+            const bibliographyText = await response.text();
+            console.log(bibliographyText); // Aquí puedes manejar el string recibido
+            setBibliographyText(bibliographyText);
         } else {
-            console.error('Error al obtener el texto del backend.');
+            console.error('Error al obtener la bibliografía del backend.');
         }
     } catch (error) {
-        console.error('Error al obtener el texto del backend:', error);
+        console.error('Error al obtener la bibliografía del backend:', error);
     }
   }
 
   const fileType = ['application/pdf'];
 
   const handleChange = (e) => {
+    //prueba 
+    setBibliographyText('');
     setPDFFile(null);
     let selectedFile = e.target.files[0];
     if(selectedFile) {
@@ -113,6 +119,10 @@ function App() {
   };
 
   const handlePDFSubmit = async (e) => {
+    // prueba
+    setTextInput('');
+    setSelectedText('');
+    setBibliographyText('');
     setViewPDF(null)
     e.preventDefault();
     if (pdfFile !== null) {
@@ -141,22 +151,12 @@ function App() {
     }
   };
 
-  // const handleInputSubmit = async () => {
-  //   try {
-  //     const response = await fetch('/uploadInputPdfId', {
-  //       method: 'POST',
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: JSON.stringify({ inputText: textInput })
-  //     });
-  //     console.log('Input Text enviado al backend exitosamente.');
-  //   } catch (error) {
-  //     console.error('Error al enviar el Input Text al backend:', error);
-  //     throw error;
-  //   }
-  // };
 
   const handleInputSubmit = async () => {
     try {
+      //ultimo
+      setBibliographyText('');
+      setSelectedText('');
       const response = await fetch('/uploadInputPdfId', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},

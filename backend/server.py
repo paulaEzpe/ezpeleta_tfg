@@ -22,8 +22,17 @@ def serve_pdf(path):
 index_name = "indice_1"
 paper_id = ""
 bibliografia = ""
+parrafo_cita = ""
 
 #################################### Funciones ####################################
+
+def modify_global_variable_parrafo(nuevo_parrafo):
+    # Indicar que se va a modificar la variable global
+    global parrafo_cita
+    # Modificar la variable global
+    parrafo_cita = nuevo_parrafo
+
+#-------------------------------------------------------------------------------
 
 def modify_global_variable_paper_id(nuevo_articulo):
     # Indicar que se va a modificar la variable global
@@ -77,7 +86,7 @@ def extraer_citas(texto):
 
 #-------------------------------------------------------------------------------
 
-def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, cita):
+def obtener_bibliografia_texto_parrafo_seleccion(client, index_name, paper_id, cita):
     consulta = {"query": {"match": {"paper_id": paper_id}}}   
     # Realizar la consulta para obtener el documento específico
     resultado = client.search(index=index_name, body=consulta)
@@ -95,6 +104,9 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
     # cojo las referencias de las citas del documento original
     bibliografia = documento_original["bib_entries"]
 
+    #para almacenar el parrafo en el que se encuentra la cita
+    parrafo_cita = ""
+
     contiene_cita = False
     bibliografia_completa = ""  # Inicializar el string de la bibliografía
 
@@ -111,6 +123,7 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
         
         if all(palabra in texto_parrafo_limpio for palabra in texto_cita_limpio):
             contiene_cita = True
+            parrafo_cita = texto
             break
 
     if contiene_cita:
@@ -134,8 +147,7 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
     else:
         bibliografia_completa = "El string no está presente en ningún objeto body_text."
 
-    return bibliografia_completa
-
+    return {"bibliografia": bibliografia_completa, "parrafo_cita": parrafo_cita}
 
 #--------------------------------------------------------------------------------------
 
@@ -283,10 +295,17 @@ def save_selected_text():
         print('Texto seleccionado:', selected_text)
         client = conexion()
         # Obtener la bibliografía
-        bibliografia_obtenida = obtener_body_documento_y_comparar_string_presente(client, index_name, paper_id, selected_text)
-        # print("La bibliografía completa es: ", bibliografia_obtenida)
+        resultado = obtener_bibliografia_texto_parrafo_seleccion(client, index_name, paper_id, selected_text)
+        # Acceder a la bibliografía
+        bibliografia_obtenida = resultado["bibliografia"]
+        # Acceder al párrafo correspondiente a la selección
+        parrafo_obtenido = resultado["parrafo_cita"]
+        parrafo_obtenido_str = json.dumps(parrafo_obtenido, indent=4)  # Convierte el JSON a una cadena con formato legible
+        print(parrafo_obtenido_str)
         # Modificar la variable global de bibliografía
         modify_global_variable_bibliografia(bibliografia_obtenida)
+        # Modificar la variable global de parrafo_cita
+        modify_global_variable_parrafo(parrafo_obtenido_str)
         # Devolver una respuesta indicando que la acción se ha completado correctamente
         return {"message": "Bibliografia guardada correctamente"}, 200
 
@@ -294,14 +313,36 @@ def save_selected_text():
 
 #------------------------------------------------------------------------------------
 
-# para enviar al frontend la bibliografia obtenida con la funcion obtener_body_documento_y_comparar_string_presente
+# para enviar al frontend la bibliografia obtenida con la funcion obtener_bibliografia_texto_parrafo_seleccion
 @app.route('/getBibliography', methods=['GET'])
 def get_received_text():
     # Aquí recupera el texto procesado anteriormente, por ejemplo, de la base de datos
     # Luego envía el texto al frontend
+    print(bibliografia)
     return bibliografia
 
 #------------------------------------------------------------------------------------
+
+@app.route('/getTextParagraphSelection', methods=['GET'])
+def get_received_paragraph_text():
+    # Aquí recupera el texto procesado anteriormente, por ejemplo, de la base de datos
+    # Luego envía el texto al frontend
+    return parrafo_cita
+
+#------------------------------------------------------------------------------------
+
+@app.route('/sendCitationToBackend', methods=['POST'])
+def receive_citation_from_frontend():
+    # Obtener la cita del cuerpo de la solicitud JSON
+    citation = request.json.get('citation')
+
+    # Aquí puedes hacer lo que necesites con la cita recibida
+    print('Cita recibida en el backend:', citation)
+
+    # Enviar una respuesta al frontend
+
+    #aqui queda que con la cita que devuelve el frontend al hacer click en ella en la lista, se busque el titulo o el arxivid en caso de tener en la bd y que lo muestre en el textarea de debajo del pdf
+    return 'Cita recibida correctamente en el backend.'
 
 
 if __name__ == "__main__":

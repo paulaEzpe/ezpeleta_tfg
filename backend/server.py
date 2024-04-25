@@ -13,6 +13,7 @@ from io import BytesIO
 
 
 
+
 app = Flask(__name__)
 CORS(app)
 
@@ -101,7 +102,7 @@ def extraer_arxiv(texto):
 
 # Para extraer el paper_id del pdf de archive que busquemos
 def extraer_arxiv_de_entry_raw(referencia):
-    regex = r"arXiv:(\d+\.\d+(?:v\d+)?)\D"  # \D coincide con cualquier carácter que no sea un número
+    regex = r"arXiv:(\d+\.\d+)"  # \D coincide con cualquier carácter que no sea un número
     match = re.search(regex, referencia)
     if match:
         id_arxiv_referencia = match.group(1)  # Obtiene el texto coincidente
@@ -381,6 +382,11 @@ def save_selected_text():
         # Mostrar el texto seleccionado en la terminal
         print("Paper_id ultimo obtenido: ", session['paper_id'])
         print('Texto seleccionado:', selected_text)
+        # Filtrar el texto para que cuando corte una palabra con un guión seguido de \n reconstruya la palabra
+        selected_text = selected_text.replace('-\n', '')
+        # Filtrar el texto seleccionado para ponerlo todo en una linea 
+        selected_text = selected_text.replace('\n', ' ')
+        print('Texto seleccionado tras sustiruir saltos de linea y guiones:', selected_text)
         client = conexion()
         # Obtener la bibliografía
         resultado = obtener_bibliografia_texto_parrafo_seleccion(client, index_name, session['paper_id'], selected_text)
@@ -428,8 +434,9 @@ def receive_citation_from_frontend():
     client = conexion()
     # extraemos el paper_id del arxiv de la referencia
     paper_id_referencia = extraer_arxiv_de_entry_raw(citation)
+    print("paper id de la referencia:", paper_id_referencia)
     # obtenemos el cuerpo del json correspondiente al paper_id de la referencia
-    texto_del_cuerpo_documento_referencia = obtener_json_por_paper_id(client, index_name, "1901.03684")
+    texto_del_cuerpo_documento_referencia = obtener_json_por_paper_id(client, index_name, "1401.4766")
     #devolver el texto del json al frontend
     # return texto_del_cuerpo_documento_referencia
     print('Cuerpo del json mandado al frontend:', texto_del_cuerpo_documento_referencia)

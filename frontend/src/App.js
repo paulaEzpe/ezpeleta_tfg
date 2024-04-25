@@ -96,7 +96,13 @@ function App() {
               // Dividir la cita en dos partes: identificador y bibliografía
               const parts = citation.split("}");
               // Tomar la segunda parte, que es la bibliografía, y eliminar espacios adicionales
-              const citationContent = parts[1].trim();
+              //const citationContent = parts.slice(1).map(part => part + "}").join("");
+              const citationContent = parts.slice(1).map((part, index, array) => {
+                if (index === array.length - 1) {
+                  return part;
+                } else {
+                  return part + "}";
+              }}).join("");
               // Construir la cita con el índice delante
               const indexedCitation = `[${index++}] ${citationContent}`;
               return indexedCitation;

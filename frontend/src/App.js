@@ -406,7 +406,7 @@ function App() {
           </div>
           <h3 className="text-view">Documento correspondiente a la referencia seleccionada</h3>
           <textarea className="form-control mt-2 w-100" style={{ 
-                          height: '300px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
+                          height: '300px', maxWidth: '90%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}} value={referenceJsonText}
                         onChange={handleTextInputChange} readOnly 
                       />

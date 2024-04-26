@@ -9,6 +9,7 @@ import os
 import json
 import requests
 from io import BytesIO 
+import PyPDF2
 
 
 
@@ -152,6 +153,45 @@ def descargar_pdf_arxiv(arxiv_id, directorio_destino):
         print(f"No se pudo descargar el PDF. Código de estado: {response.status_code}")
         return None  # Devuelve None si no se pudo descargar el PDF
 
+#----------------------------------------------
+
+# Función para descargar un pdf y extraer su texto
+def descargar_y_extraer_texto_pdf_arxiv(arxiv_id, directorio_destino):
+    # Construye la URL del PDF
+    url_pdf = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
+    
+    # Descarga el PDF
+    response = requests.get(url_pdf)
+    if response.status_code == 200:
+        
+        # Guarda el PDF en el directorio especificado
+        ruta_pdf = os.path.join(directorio_destino, f"{arxiv_id}.pdf")
+        with open(ruta_pdf, 'wb') as f:
+            f.write(response.content)
+        print(f"PDF descargado correctamente: {ruta_pdf}")
+        
+        # Extraer texto del PDF
+        texto = extraer_texto_pdf(ruta_pdf)
+        return texto, ruta_pdf  # Devuelve el texto extraído y la ruta del PDF descargado
+    else:
+        print(f"No se pudo descargar el PDF. Código de estado: {response.status_code}")
+        return None, None  # Devuelve None si no se pudo descargar el PDF
+
+#-------------------------------------------------------------------------------------
+
+# Función auxiliar para extraer el texto de un pdf
+def extraer_texto_pdf(ruta_pdf):
+    texto = ""
+    with open(ruta_pdf, 'rb') as f:
+        pdf_reader = PyPDF2.PdfReader(f)
+        for page in pdf_reader.pages:
+            texto += page.extract_text()
+    return texto
+# Ejemplo de uso
+# texto_extraido, ruta_del_pdf = descargar_y_extraer_texto_pdf_arxiv("1401.4766", "../datos/")
+# print("Texto extraído del PDF:")
+# print(texto_extraido)
+    
 
 ################################## Gestiones con ElasticSearch ######################
 
@@ -206,7 +246,7 @@ def obtener_titulo_por_paper_id(client, index_name, paper_id):
 #------------------------------------------------------------------------------------
 
 # Función que devuelve el texto del cuerpo de un documento en formato JSON, dado su paper_id
-def obtener_json_por_paper_id(client, index_name, paper_id_referencia):
+def obtener_json_por_paper_id_u_obtener_texto(client, index_name, paper_id_referencia):
     resultado = client.search(
         index=index_name,
         body={
@@ -243,7 +283,13 @@ def obtener_json_por_paper_id(client, index_name, paper_id_referencia):
             texto_cuerpo_json += texto_parrafo + "\n"
         return texto_cuerpo_json
     else:
-        return "No se ha podido obtener el json correspondiente ya que no se encuentra en la base de datos"
+        print("como no se ha encontrado el documento en la base de datos, lo descargo y extraigo el texto")
+        # return "No se ha podido obtener el json correspondiente ya que no se encuentra en la base de datos"
+        # NUEVO
+        # Si el paper_id no se encuentra en la base de datos, descargar y extraer el PDF
+        texto_pdf, _ = descargar_y_extraer_texto_pdf_arxiv(paper_id_referencia, "../datos/")
+        return texto_pdf
+        
 
 #------------------------------------------------------------------------------------
 
@@ -279,6 +325,8 @@ def obtener_bibliografia_texto_parrafo_seleccion(client, index_name, paper_id, c
         # cojo las citas del parrafo
         citas = obj["cite_spans"]
 
+
+        # Tengo que moidificar esto para que en vez de coger texto tal cual de la cita, primero lo tokenice, y lo compare con los párrafos, necesitando un 90% de coincnidencia entre las palabras, por si la selección de la cita, se come algo del principio o del final de una palabra
         texto_parrafo_limpio = limpiar_texto(texto)
         texto_parrafo = ' '.join(texto_parrafo_limpio)
         
@@ -436,8 +484,9 @@ def receive_citation_from_frontend():
     paper_id_referencia = extraer_arxiv_de_entry_raw(citation)
     print("paper id de la referencia:", paper_id_referencia)
     # obtenemos el cuerpo del json correspondiente al paper_id de la referencia
-    texto_del_cuerpo_documento_referencia = obtener_json_por_paper_id(client, index_name, "1401.4766")
+    texto_del_cuerpo_documento_referencia = obtener_json_por_paper_id_u_obtener_texto(client, index_name, paper_id_referencia)
     #devolver el texto del json al frontend
+    # en caso de que me devuelva que no está en la bd, buscar en archive el paper y devolverlo en forma de texto
     # return texto_del_cuerpo_documento_referencia
     print('Cuerpo del json mandado al frontend:', texto_del_cuerpo_documento_referencia)
     return texto_del_cuerpo_documento_referencia

@@ -32,10 +32,6 @@ def obtain_list_english_words(texto, cita):
 
     return obtained_text_words, obtained_cite_words
 
-# Llamada a la función
-#lista_texto_palabras, lista_cita_palabras = obtain_english_words(text, cita)
-
-
 #############################################################################################################
 
 # Funcion que dados dos conjuntos, devuelve true si el primero de ellos contiene al menos el 80% de las palabras del segundo
@@ -81,7 +77,7 @@ def algoritmo(lista_parrafo, lista_cita):
     
     
 # Llamada a la función
-lista_parrafo = ["hola", "que", "tal", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite", "que", "tal", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite", "que", "tal", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite"]
+lista_parrafo = ["hola", "que", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite", "tal", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite", "que", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite"]
 lista_cita = ["que", "tal", "estas", "soy"]
 
 resultado = algoritmo(lista_parrafo, lista_cita)

@@ -12,9 +12,6 @@ from io import BytesIO
 import PyPDF2
 
 
-
-
-
 app = Flask(__name__)
 CORS(app)
 
@@ -25,9 +22,9 @@ Session(app)
 
 ####################################################################
 
-@app.route('/datos/<path:path>')
-def serve_pdf(path):
-    return send_from_directory('/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/web2/datos', path)
+# @app.route('/datos/<path:path>')
+# def serve_pdf(path):
+#     return send_from_directory('/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/web2/datos', path)
 
 # El nombre del índice de la BD
 index_name = "indice_1"
@@ -35,31 +32,6 @@ index_name = "indice_1"
 # paper_id = ""
 # bibliografia = ""
 # parrafo_cita = ""
-
-
-
-
-# def modify_parrafo_cita(nuevo_parrafo):
-#     # Indicar que se va a modificar la variable global
-#     global parrafo_cita
-#     # Modificar la variable global
-#     parrafo_cita = nuevo_parrafo
-
-# #-------------------------------------------------------------------------------
-
-# def modify_paper_id(nuevo_articulo):
-#     # Indicar que se va a modificar la variable global
-#     global paper_id
-#     # Modificar la variable global
-#     paper_id = nuevo_articulo
-
-# #---------------------------------------------------------------------------------
-
-# def modify_bibliografia(biblio):
-#     # Indicar que se va a modificar la variable global
-#     global bibliografia
-#     # Modificar la variable global
-#     bibliografia = biblio
 
 
 ####################Funciones para modificar las variables de sesion######################

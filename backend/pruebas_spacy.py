@@ -50,27 +50,59 @@ def contiene_suficientes_palabras(conjunto_parrafo, conjunto_cita):
 
 #############################################################################################################
 
+# def algoritmo(lista_parrafo, lista_cita):
+#     max_consecutivas = 0  # Inicializamos el máximo número de coincidencias consecutivas
+#     max_subsecuencia = []  # Inicializamos la subsecuencia más larga que coincide
+    
+#     if contiene_suficientes_palabras(set(lista_parrafo), set(lista_cita)):
+#         # Iteramos sobre la lista de párrafo para considerar todas las subsecuencias posibles
+#         for i in range(len(lista_parrafo)):
+#             for j in range(i + 1, len(lista_parrafo) + 1):
+#                 subsecuencia = lista_parrafo[i:j]
+                
+#                 # Iteramos sobre todas las subsecuencias posibles de la lista de cita
+#                 for k in range(len(lista_cita)):
+#                     for l in range(k + 1, len(lista_cita) + 1):
+#                         subsecuencia_cita = lista_cita[k:l]
+                        
+#                         # Si la subsecuencia del párrafo coincide con la subsecuencia de la cita, actualizamos max_consecutivas y max_subsecuencia
+#                         if subsecuencia == subsecuencia_cita:
+#                             if len(subsecuencia_cita) > max_consecutivas:
+#                                 max_consecutivas = len(subsecuencia_cita)
+#                                 max_subsecuencia = subsecuencia_cita
+#     else: 
+#         print("El párrafo no contiene suficientes palabras de la cita")
+#         # devolverá 0 y la lista vacía
+#     return max_consecutivas, max_subsecuencia
+
+
 def algoritmo(lista_parrafo, lista_cita):
     max_consecutivas = 0  # Inicializamos el máximo número de coincidencias consecutivas
     max_subsecuencia = []  # Inicializamos la subsecuencia más larga que coincide
-    
+
     if contiene_suficientes_palabras(set(lista_parrafo), set(lista_cita)):
+        # Creamos un diccionario para almacenar el índice de cada palabra en lista_cita
+        indices_cita = {palabra: i for i, palabra in enumerate(lista_cita)}
+
         # Iteramos sobre la lista de párrafo para considerar todas las subsecuencias posibles
         for i in range(len(lista_parrafo)):
             for j in range(i + 1, len(lista_parrafo) + 1):
                 subsecuencia = lista_parrafo[i:j]
-                
-                # Iteramos sobre todas las subsecuencias posibles de la lista de cita
-                for k in range(len(lista_cita)):
-                    for l in range(k + 1, len(lista_cita) + 1):
-                        subsecuencia_cita = lista_cita[k:l]
-                        
-                        # Si la subsecuencia del párrafo coincide con la subsecuencia de la cita, actualizamos max_consecutivas y max_subsecuencia
-                        if subsecuencia == subsecuencia_cita:
-                            if len(subsecuencia_cita) > max_consecutivas:
-                                max_consecutivas = len(subsecuencia_cita)
-                                max_subsecuencia = subsecuencia_cita
-    else: 
+
+                # Verificamos si las palabras en subsecuencia aparecen en lista_cita en el mismo orden
+                k = -1
+                for palabra in subsecuencia:
+                    if palabra in indices_cita and indices_cita[palabra] > k:
+                        k = indices_cita[palabra]
+                    else:
+                        break
+                else:
+                    # Si la subsecuencia del párrafo coincide con la subsecuencia de la cita, actualizamos max_consecutivas y max_subsecuencia
+                    if j - i > max_consecutivas:
+                        max_consecutivas = j - i
+                        max_subsecuencia = subsecuencia
+
+    else:
         print("El párrafo no contiene suficientes palabras de la cita")
         # devolverá 0 y la lista vacía
     return max_consecutivas, max_subsecuencia

@@ -11,6 +11,9 @@ import requests
 from io import BytesIO 
 import PyPDF2
 
+# Importar las clases de los otros módulos
+from pdf_processor import PDFProcessor
+from text_processor import TextProcessor
 
 app = Flask(__name__)
 CORS(app)
@@ -22,20 +25,10 @@ Session(app)
 
 ####################################################################
 
-# @app.route('/datos/<path:path>')
-# def serve_pdf(path):
-#     return send_from_directory('/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/web2/datos', path)
-
 # El nombre del índice de la BD
 index_name = "indice_1"
 
-# paper_id = ""
-# bibliografia = ""
-# parrafo_cita = ""
-
-
 ####################Funciones para modificar las variables de sesion######################
-
 
 @app.before_request
 def init_session():
@@ -57,113 +50,6 @@ def modify_bibliografia(new_bibliografia):
 def modify_parrafo_cita(new_parrafo_cita):
     session['parrafo_cita'] = new_parrafo_cita
 
-
-#################################### Funciones ####################################
-
-# Para extraer el paper_id del pdf de archive que busquemos
-def extraer_arxiv(texto):
-    regex = r"arXiv:(\d+\.\d+(?:v\d+)?)"
-    match = re.search(regex, texto)
-    if match:
-        resultado = match.group(1)  # Obtiene el texto coincidente
-        resultado_sin_v = resultado.split('v')[0]  # Elimina 'v' y lo que le sigue
-        return resultado_sin_v
-    else:
-        return None 
-
-#-------------------------------------------------------------------------------------
-
-# Para extraer el paper_id del pdf de archive que busquemos
-def extraer_arxiv_de_entry_raw(referencia):
-    regex = r"arXiv:(\d+\.\d+)"  # \D coincide con cualquier carácter que no sea un número
-    match = re.search(regex, referencia)
-    if match:
-        id_arxiv_referencia = match.group(1)  # Obtiene el texto coincidente
-        return id_arxiv_referencia
-    else:
-        return None
-
-#-------------------------------------------------------------------------------------
-
-def limpiar_texto(texto):
-    # Eliminar secuencias de números y letras seguidos
-    texto_limpio = re.sub(r'\b\w+\d+\w*\b', '', texto.lower())
-    # Eliminar caracteres no alfanuméricos y convertir a minúsculas
-    texto_limpio = re.sub(r'[^\w\s]', '', texto_limpio)
-    # Dividir el texto en palabras
-    palabras = texto_limpio.split()
-    return palabras
-
-#---------------------------------------------------------
-
-def extraer_citas(texto):
-    # Expresión regular para encontrar citas
-    patron = r'\{\{cite:[^\}]+\}\}'
-    # Encontrar todas las coincidencias de la expresión regular en el texto
-    citas_encontradas = re.findall(patron, texto)
-    # Retornar las citas encontradas
-    return citas_encontradas
-
-#--------------------------------------------------------------------------------------
-
-# Para descargarme el pdf correspondiente cuando solo me pasan el id del paper por el input
-def descargar_pdf_arxiv(arxiv_id, directorio_destino):
-    # Construye la URL del PDF
-    url_pdf = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
-    
-    # Descarga el PDF
-    response = requests.get(url_pdf)
-    if response.status_code == 200:
-        
-        # Guarda el PDF en el directorio especificado
-        ruta_pdf = os.path.join(directorio_destino, f"{arxiv_id}.pdf")
-        with open(ruta_pdf, 'wb') as f:
-            f.write(response.content)
-        print(f"PDF descargado correctamente: {ruta_pdf}")
-        return ruta_pdf  # Devuelve la ruta del PDF descargado
-    else:
-        print(f"No se pudo descargar el PDF. Código de estado: {response.status_code}")
-        return None  # Devuelve None si no se pudo descargar el PDF
-
-#----------------------------------------------
-
-# Función para descargar un pdf y extraer su texto
-def descargar_y_extraer_texto_pdf_arxiv(arxiv_id, directorio_destino):
-    # Construye la URL del PDF
-    url_pdf = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
-    
-    # Descarga el PDF
-    response = requests.get(url_pdf)
-    if response.status_code == 200:
-        
-        # Guarda el PDF en el directorio especificado
-        ruta_pdf = os.path.join(directorio_destino, f"{arxiv_id}.pdf")
-        with open(ruta_pdf, 'wb') as f:
-            f.write(response.content)
-        print(f"PDF descargado correctamente: {ruta_pdf}")
-        
-        # Extraer texto del PDF
-        texto = extraer_texto_pdf(ruta_pdf)
-        return texto, ruta_pdf  # Devuelve el texto extraído y la ruta del PDF descargado
-    else:
-        print(f"No se pudo descargar el PDF. Código de estado: {response.status_code}")
-        return None, None  # Devuelve None si no se pudo descargar el PDF
-
-#-------------------------------------------------------------------------------------
-
-# Función auxiliar para extraer el texto de un pdf
-def extraer_texto_pdf(ruta_pdf):
-    texto = ""
-    with open(ruta_pdf, 'rb') as f:
-        pdf_reader = PyPDF2.PdfReader(f)
-        for page in pdf_reader.pages:
-            texto += page.extract_text()
-    return texto
-# Ejemplo de uso
-# texto_extraido, ruta_del_pdf = descargar_y_extraer_texto_pdf_arxiv("1401.4766", "../datos/")
-# print("Texto extraído del PDF:")
-# print(texto_extraido)
-    
 
 ################################## Gestiones con ElasticSearch ######################
 
@@ -250,7 +136,7 @@ def obtener_json_por_paper_id_u_obtener_texto(client, index_name, paper_id_refer
         for obj in body_text:
             # cojo el parrafo
             texto = obj["text"]
-            texto_parrafo_limpio = limpiar_texto(texto)
+            texto_parrafo_limpio = TextProcessor.limpiar_texto(texto)
             texto_parrafo = ' '.join(texto_parrafo_limpio)
             texto_cuerpo_json += texto_parrafo + "\n"
         return texto_cuerpo_json
@@ -259,7 +145,7 @@ def obtener_json_por_paper_id_u_obtener_texto(client, index_name, paper_id_refer
         # return "No se ha podido obtener el json correspondiente ya que no se encuentra en la base de datos"
         # NUEVO
         # Si el paper_id no se encuentra en la base de datos, descargar y extraer el PDF
-        texto_pdf, _ = descargar_y_extraer_texto_pdf_arxiv(paper_id_referencia, "../datos/")
+        texto_pdf, _ = PDFProcessor.descargar_y_extraer_texto_pdf_arxiv(paper_id_referencia, "../datos/")
         return texto_pdf
         
 
@@ -289,7 +175,7 @@ def obtener_bibliografia_texto_parrafo_seleccion(client, index_name, paper_id, c
     contiene_cita = False
     bibliografia_completa = ""  # Inicializar el string de la bibliografía
 
-    texto_cita_limpio = limpiar_texto(cita)
+    texto_cita_limpio = TextProcessor.limpiar_texto(cita)
 
     for obj in body_text:
         # cojo el parrafo
@@ -299,7 +185,7 @@ def obtener_bibliografia_texto_parrafo_seleccion(client, index_name, paper_id, c
 
 
         # Tengo que moidificar esto para que en vez de coger texto tal cual de la cita, primero lo tokenice, y lo compare con los párrafos, necesitando un 90% de coincnidencia entre las palabras, por si la selección de la cita, se come algo del principio o del final de una palabra
-        texto_parrafo_limpio = limpiar_texto(texto)
+        texto_parrafo_limpio = TextProcessor.limpiar_texto(texto)
         texto_parrafo = ' '.join(texto_parrafo_limpio)
         
         if all(palabra in texto_parrafo_limpio for palabra in texto_cita_limpio):
@@ -311,7 +197,7 @@ def obtener_bibliografia_texto_parrafo_seleccion(client, index_name, paper_id, c
         #print(texto)
         bibliografia_completa = ""  # Inicializar el string de la bibliografía
         # si contiene la cita, extraigo las citas del parrafo correspondiente al texto que ha seleccionado el usuario
-        citas_seleccionadas = extraer_citas(texto)
+        citas_seleccionadas = TextProcessor.extraer_citas(texto)
         # ahora en citas_seleccionadas, estan las citas que ha seleccionado el usuario al seleccionar texto en el párrafo
         #ahora las contrasto con las citas que aparecen en el parrfo correspondiente a la seleccion
         for cita in citas_seleccionadas:
@@ -333,6 +219,10 @@ def obtener_bibliografia_texto_parrafo_seleccion(client, index_name, paper_id, c
 
 ################################### Rutas #############################################
 
+@app.route('/datos/<path:path>')
+def serve_pdf(path):
+    return send_from_directory('/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/web2/datos', path)
+
 # Para recibir el pdf 
 @app.route("/uploadPDFText", methods=["POST"])
 def upload_pdf_text():
@@ -343,7 +233,8 @@ def upload_pdf_text():
     else:
         # Buscar el documento en elasticsearch
         #paper_id = extraer_arxiv(pdf_text)
-        modify_paper_id(extraer_arxiv(pdf_text))
+        # pdf_processor = PDFProcessor()
+        modify_paper_id(PDFProcessor.extraer_arxiv(pdf_text))
         print("Id del documento subido:", session['paper_id'])
         client = conexion()
         #verificar_conexion(client)
@@ -372,7 +263,7 @@ def upload_input_text():
         #paper_id=input_text
         modify_paper_id(input_text)
         print("Id del documento buscado y descargado:", session['paper_id'])
-        pdf_path = descargar_pdf_arxiv(session['paper_id'], "../datos/")
+        pdf_path = PDFProcessor.descargar_pdf_arxiv(session['paper_id'], "../datos/")
         print("lo he descargadoi sin problemas")
         if pdf_path:
             # Devolver la ruta del PDF al cliente
@@ -453,14 +344,14 @@ def receive_citation_from_frontend():
     # extraer el paper_id del entry_raw 
     client = conexion()
     # extraemos el paper_id del arxiv de la referencia
-    paper_id_referencia = extraer_arxiv_de_entry_raw(citation)
+    paper_id_referencia = PDFProcessor.extraer_arxiv_de_entry_raw(citation)
     print("paper id de la referencia:", paper_id_referencia)
     # obtenemos el cuerpo del json correspondiente al paper_id de la referencia
     texto_del_cuerpo_documento_referencia = obtener_json_por_paper_id_u_obtener_texto(client, index_name, paper_id_referencia)
     #devolver el texto del json al frontend
     # en caso de que me devuelva que no está en la bd, buscar en archive el paper y devolverlo en forma de texto
     # return texto_del_cuerpo_documento_referencia
-    print('Cuerpo del json mandado al frontend:', texto_del_cuerpo_documento_referencia)
+    #print('Cuerpo del json mandado al frontend:', texto_del_cuerpo_documento_referencia)
     return texto_del_cuerpo_documento_referencia
 
 

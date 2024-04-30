@@ -1,5 +1,6 @@
 import spacy
 import re
+import time
 
 ############Probando spaCy#############
 
@@ -50,30 +51,6 @@ def contiene_suficientes_palabras(conjunto_parrafo, conjunto_cita):
 
 #############################################################################################################
 
-# def algoritmo(lista_parrafo, lista_cita):
-#     max_consecutivas = 0  # Inicializamos el máximo número de coincidencias consecutivas
-#     max_subsecuencia = []  # Inicializamos la subsecuencia más larga que coincide
-    
-#     if contiene_suficientes_palabras(set(lista_parrafo), set(lista_cita)):
-#         # Iteramos sobre la lista de párrafo para considerar todas las subsecuencias posibles
-#         for i in range(len(lista_parrafo)):
-#             for j in range(i + 1, len(lista_parrafo) + 1):
-#                 subsecuencia = lista_parrafo[i:j]
-                
-#                 # Iteramos sobre todas las subsecuencias posibles de la lista de cita
-#                 for k in range(len(lista_cita)):
-#                     for l in range(k + 1, len(lista_cita) + 1):
-#                         subsecuencia_cita = lista_cita[k:l]
-                        
-#                         # Si la subsecuencia del párrafo coincide con la subsecuencia de la cita, actualizamos max_consecutivas y max_subsecuencia
-#                         if subsecuencia == subsecuencia_cita:
-#                             if len(subsecuencia_cita) > max_consecutivas:
-#                                 max_consecutivas = len(subsecuencia_cita)
-#                                 max_subsecuencia = subsecuencia_cita
-#     else: 
-#         print("El párrafo no contiene suficientes palabras de la cita")
-#         # devolverá 0 y la lista vacía
-#     return max_consecutivas, max_subsecuencia
 
 
 def algoritmo(lista_parrafo, lista_cita):
@@ -107,12 +84,55 @@ def algoritmo(lista_parrafo, lista_cita):
         # devolverá 0 y la lista vacía
     return max_consecutivas, max_subsecuencia
     
+
+###########################################################################
+
+
+# dadas dos listas de strings, da la longitud del mayor
+# prefijo comun, empezando en los índices i1, i2, respectivamente
+def longestPrefixIndex(list_1,i1,list_2,i2):
+    minLen = min((len(list_1)-i1,len(list_2)-i2))
+    k = 0
+    while k < minLen and list_1[i1+k] == list_2[i2+k]:
+        k += 1
+ 
+    return k
+#---------------------------------------------------   
+# dos listas de palabras
+
+def longestCommonSubseq(list_1, list_2):
+    longest = 0
+    if contiene_suficientes_palabras(set(list_1), set(list_2)):
+        #obtener el prefijo común más largo empezando en i1 e i2
+        for i1 in range(len(list_1)):
+            for i2 in range(len(list_2)):
+                longestPartial = longestPrefixIndex(list_1,i1,list_2,i2)
+                if longestPartial > longest:
+                    longest = longestPartial
+
+
+    return longest
+
+#---------------------------------------------------
+
     
 # Llamada a la función
 lista_parrafo = ["hola", "que", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite", "tal", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite", "que", "estas", "soy", "un", "párrafo", "con", "varias", "palabras", "que", "se", "repite"]
 lista_cita = ["que", "tal", "estas", "soy"]
 
+start_time = time.perf_counter()
+long = longestCommonSubseq(lista_parrafo, lista_cita)
+end_time = time.perf_counter()
+tiempo_de_ejecucion = end_time - start_time
+print("El tiempo de ejecución de longestCommonSubseq es:", tiempo_de_ejecucion, "segundos.")
+print('l1: %s\nl2: %s'%(lista_parrafo,lista_cita))
+print('longest: %d'%(long))
+
+start_time = time.perf_counter()
 resultado = algoritmo(lista_parrafo, lista_cita)
+end_time = time.perf_counter()
+tiempo_de_ejecucion = end_time - start_time
+print("El tiempo de ejecución de algoritmo es:", tiempo_de_ejecucion, "segundos.")
 print("Máximo número de coincidencias consecutivas:", resultado)
     
 

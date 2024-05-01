@@ -1,6 +1,5 @@
 from opensearchpy import OpenSearch
-from opensearch_dsl import Search
-from opensearch_dsl import Document, Text, Keyword
+from opensearch_dsl import Search, Document
 from flask import Flask, request, send_file, jsonify, url_for, Response, redirect, send_from_directory, session
 from flask_session import Session
 from flask_cors import CORS
@@ -24,12 +23,12 @@ app.config['SECRET_KEY'] = os.urandom(24) # para establecer la clave para la ses
 app.config['SESSION_TYPE'] = 'filesystem'  # Puedes elegir otros métodos de almacenamiento
 Session(app)
 
-####################################################################
+########################################################################################
 
 # El nombre del índice de la BD
 index_name = "indice_1"
 
-####################Funciones para modificar las variables de sesion######################
+#################### Funciones para modificar las variables de sesion ##################
 
 @app.before_request
 def init_session():
@@ -40,7 +39,7 @@ def init_session():
     if 'parrafo_cita' not in session:
         session['parrafo_cita'] = ""
     
-#-------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------
 
 def modify_paper_id(new_paper_id):
     session['paper_id'] = new_paper_id
@@ -52,7 +51,7 @@ def modify_parrafo_cita(new_parrafo_cita):
     session['parrafo_cita'] = new_parrafo_cita
 
 
-################################## Gestiones con ElasticSearch ######################
+################################## ElasticSearch ######################################
 
 client = ElasticsearchClient()
 
@@ -166,7 +165,7 @@ def save_selected_text():
 def get_received_text():
     # Aquí recupera el texto procesado anteriormente, por ejemplo, de la base de datos
     # Luego envía el texto al frontend
-    print(session['bibliografia'])
+    # print(session['bibliografia'])
     return session['bibliografia']
 
 #------------------------------------------------------------------------------------

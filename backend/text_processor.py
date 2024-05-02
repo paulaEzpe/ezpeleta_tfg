@@ -12,7 +12,6 @@ class TextProcessor:
     def __init__(self):
         pass
 
-    
 
     @staticmethod
     def limpiar_texto(texto):
@@ -35,6 +34,7 @@ class TextProcessor:
 
 
     # dados dos strings, devuelve una lista con las palabras alfabéticas de cada uno de ellos
+    @staticmethod
     def obtain_list_english_words(texto, cita):
 
         # Poner en minúsculas el texto y la cita
@@ -48,11 +48,6 @@ class TextProcessor:
         # Obtener todas las palabras alfabéticas detectadas por spaCy
         obtained_text_words = [token.text for token in texto_procesado if token.is_alpha]
         obtained_cite_words = [token.text for token in cita_procesada if token.is_alpha]
-
-        # print("Lista de palabras del texto en inglés:")
-        # print(obtained_text_words)
-        # print("Lista de palabras de la cita en inglés:")
-        # print(obtained_cite_words)
 
         return obtained_text_words, obtained_cite_words
 
@@ -81,8 +76,7 @@ class TextProcessor:
             k += 1
     
         return k
-    #---------------------------------------------------   
-    # dos listas de palabras
+ 
 
     def longestCommonSubseq(self, list_1, list_2):
         longest = 0
@@ -100,3 +94,41 @@ class TextProcessor:
         return longest
 
     #---------------------------------------------------
+
+    @staticmethod
+    def compute_prefix_function(pattern):
+        m = len(pattern)
+        pi = [0] * m
+        k = 0
+        for q in range(1, m):
+            while k > 0 and pattern[k] != pattern[q]:
+                k = pi[k - 1]
+            if pattern[k] == pattern[q]:
+                k += 1
+            pi[q] = k
+        return pi
+
+    @staticmethod
+    def kmp_search(text, pattern):
+        n = len(text)
+        m = len(pattern)
+        pi = TextProcessor.compute_prefix_function(pattern)
+        q = 0
+        maxLong = 0 
+        for i in range(n):
+            while q > 0 and pattern[q] != text[i]:
+                q = pi[q - 1]
+            if pattern[q] == text[i]:
+                q += 1
+                maxLong = max(maxLong, q)
+            else:
+                q = 0
+        return maxLong
+
+    def longestCommonSubseq_KMP(self, pattern, text):
+        maxLong = 0
+        if self.contiene_suficientes_palabras(set(pattern), set(text)):
+            for i in range(len(pattern)):
+                partialLong = self.kmp_search(text, pattern[i:])
+                maxLong = max(maxLong, partialLong)
+        return maxLong

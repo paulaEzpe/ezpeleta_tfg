@@ -201,7 +201,7 @@ class ElasticsearchClient:
     #     bibliografia_completa = ""  # Inicializar el string de la bibliografía
 
     #     mejor_parrafo = ""
-    #     max_coincidencias = 0
+    #     max_coincidencias = 0   
     #     mejor_citas = []
 
     #     processor = TextProcessor()

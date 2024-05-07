@@ -254,3 +254,46 @@ class ElasticsearchClient:
     #             bibliografia_completa += f"La cita {{cite:{cita}}} no coincide con ninguna cita en obj.\n"
         
     #     return {"bibliografia": bibliografia_completa, "parrafo_cita": mejor_parrafo}
+
+    def obtener_tokens_cuerpo(self, index_name, paper_id_obtener, archivo_destino): 
+        resultado = self.client.search(
+            index=index_name,
+            body={
+                "query": {
+                    "match": {
+                        "paper_id": paper_id_obtener
+                    }
+                }
+            }
+        )
+        print("El id del docukento que se esta buscando es:", paper_id_obtener)
+        hits = resultado["hits"]["hits"]
+        if hits: 
+            tokens_texto = []
+            documento_especifico = hits[0]["_source"]
+            # Acceder al campo json_data para obtener el documento serializado
+            documento_serializado = documento_especifico["json_data"]
+
+            # Deserializar el documento serializado para obtener el documento original
+            documento_original = json.loads(documento_serializado)
+
+            # Acceder al campo body_text del documento original
+            body_text = documento_original["body_text"]
+
+            for obj in body_text:
+                # cojo el parrafo
+                texto = obj["text"]
+                texto_parrafo_limpio = self.text_processor.limpiar_texto(texto)
+                texto_parrafo = ' '.join(texto_parrafo_limpio)
+                tokens_obtenidos = self.text_processor.obtain_list_english_words_fron_body(texto_parrafo)
+                tokens_texto += tokens_obtenidos
+            return tokens_texto
+        else:
+            print("como no se ha encontrado el documento en la base de datos, lo descargo y extraigo el texto")
+            # Si el paper_id no se encuentra en la base de datos, descargar y extraer el PDF
+            texto_pdf, _ = PDFProcessor.descargar_y_extraer_texto_pdf_arxiv(paper_id_obtener, "../datos/")
+            texto_parrafo_limpio = self.text_processor.limpiar_texto(texto_pdf)
+            texto_parrafo = ' '.join(texto_parrafo_limpio)
+            print(type(texto_parrafo)) 
+            tokens_obtenidos = self.text_processor.obtain_list_english_words_from_body(texto_parrafo)
+            return tokens_obtenidos

@@ -285,7 +285,7 @@ class ElasticsearchClient:
                 texto = obj["text"]
                 texto_parrafo_limpio = self.text_processor.limpiar_texto(texto)
                 texto_parrafo = ' '.join(texto_parrafo_limpio)
-                tokens_obtenidos = self.text_processor.obtain_list_english_words_fron_body(texto_parrafo)
+                tokens_obtenidos = self.text_processor.obtain_list_english_words_from_body(texto_parrafo)
                 tokens_texto += tokens_obtenidos
             return tokens_texto
         else:
@@ -297,3 +297,43 @@ class ElasticsearchClient:
             print(type(texto_parrafo)) 
             tokens_obtenidos = self.text_processor.obtain_list_english_words_from_body(texto_parrafo)
             return tokens_obtenidos
+
+
+    # Funcion para obtener los paper_id de los primeros 10 documentos y los ultimos 10 documentos de index_name
+    def obtener_paper_ids(self, index_name):
+        n1, n2 = 2, 2
+        # Consulta para obtener los primeros 10 documentos del índice
+        resultados_principio = self.client.search(
+            index=index_name,
+            body={
+                "size": n1,  # Recuperar 10 documentos
+                "query": {
+                    "match_all": {}  # Coincidir con todos los documentos
+                }
+            }
+        )
+        
+        # Consulta para obtener los últimos 10 documentos del índice
+        resultados_final = self.client.search(
+            index=index_name,
+            body={
+                "size": n2,  # Recuperar 10 documentos
+                "query": {
+                    "match_all": {}  # Coincidir con todos los documentos
+                },
+                "sort": [
+                    {"_id": {"order": "desc"}}  # Ordenar por identificador de documento en orden descendente
+                ]
+            }
+        )
+        
+        # Extraer los paper_id de los primeros 10 documentos
+        paper_ids_principio = [hit["_source"]["paper_id"] for hit in resultados_principio["hits"]["hits"]]
+        
+        # Extraer los paper_id de los últimos 10 documentos
+        paper_ids_final = [hit["_source"]["paper_id"] for hit in resultados_final["hits"]["hits"]]
+        
+        return paper_ids_principio, paper_ids_final
+
+
+    

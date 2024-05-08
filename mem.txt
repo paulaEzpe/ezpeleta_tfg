@@ -84,3 +84,10 @@ con la del pdf que existe
 2º de la seleccion del pdf, buscar la zona del body text con la referencia que estan seleccionando y extraer la referencia y mostrarla en un panel talcual esta en el json. sacar tambien ahi las referencias del json primigeneo (las que aparezcan en el parrafo). me traigo los jsons de las referencias
 
 ya esta hechjo. hay que arreglar cosillas como el match bien hecho, y como que en caso de que el pdf que intenta desacargar no exista, le salga un popup o algo
+
+
+-------------------------------------------------------------------------------------------------
+obtención de los tokens de 200 documentos de opensearch (100 del principio y 100 del final):
+Longitud de lista de listas: 20
+Tamaño de la lista en bytes: 693k bytes
+tiempo dedicado: 99.7130426270005 segundos

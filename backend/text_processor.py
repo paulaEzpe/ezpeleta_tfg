@@ -64,6 +64,7 @@ class TextProcessor:
 
         return obtained_text_words
 
+
     @staticmethod
     # Funcion que dados dos conjuntos, devuelve true si el primero de ellos contiene al menos el 80% de las palabras del segundo
     def contiene_suficientes_palabras(conjunto_parrafo, conjunto_cita):
@@ -79,6 +80,7 @@ class TextProcessor:
         else:
             return False
 
+#---------------------------------------------------
 
     # dadas dos listas de strings, da la longitud del mayor
     # prefijo comun, empezando en los índices i1, i2, respectivamente

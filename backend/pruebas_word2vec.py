@@ -76,116 +76,6 @@ modelo_google = '../datos/GoogleNews-vectors-negative300.bin'
 #-----------------------------------------------------------------
 ##############Funciones para entrenar el modelo con todos los json de las carpetas###############
 
-class ObtenerParrafos(object):
-    def __init__(self, jsonfile):
-        self.jsonfile = jsonfile
-
-    def __iter__(self):
-        try:
-            for line in open(self.jsonfile, mode='rt', encoding='UTF-8'):
-                line_json = json.loads(line)
-                # Extrae los campos a indexar
-                body = line_json["body_text"]
-                for obj in body:
-                    # cojo el parrafo, que sera de tipo string
-                    texto = limpiar_texto_entrenar(obj["text"])
-                    # Procesar el texto y la cita con el modelo de spaCy
-                    texto_procesado = nlp(texto)
-                    # Obtener todas las palabras alfabéticas detectadas por spaCy
-                    obtained_text_words = [token.text for token in texto_procesado if token.is_alpha]
-                    # print(obtained_text_words[0])
-                    yield obtained_text_words
-        except Exception:
-            print ('Failed reading file: ')
-            print (self.jsonfile)
-
-
-class ObtenerParrafosDeJSONS(object):
-    # carpeta es el path completo
-    def __init__(self, carpeta):
-        self.carpeta = carpeta
-
-    def __iter__(self):
-        try:
-            for fjson in os.listdir(carpeta_completa):
-                yield ObtenerParrafos(os.path.join(carpeta_completa, fjson))
-        except Exception:
-            print ('Failed reading file: ')
-            print (self.carpeta)
-
-class ObtenerParrafosDeDirectorio(object):
-    # carpeta es el path completo
-    def __init__(self, nombre_directorio):
-        self.nombre_directorio = nombre_directorio
-
-    def __iter__(self):
-        try:
-            for carpeta in os.listdir(nombre_directorio):
-                yield ObtenerParrafosDeJSONS(os.path.join(nombre_directorio, carpeta))
-        except Exception:
-            print ('Failed reading directory: ')
-            print (self.nombre_directorio)
-            
-
-mis_palabras = ObtenerParrafosDeDirectorio("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset")
-
-# Iterar sobre mis_palabras para obtener las palabras de todos los archivos JSON
-palabras = []
-for parrafos_jsons in mis_palabras:
-    for palabras_parrafo in parrafos_jsons:
-        palabras.extend(palabras_parrafo)
-
-# Crear modelo Word2Vec
-model = Word2Vec(min_count=1)
-
-# Construir vocabulario
-model.build_vocab([palabras])
-
-# Entrenar el modelo
-model.train([palabras], total_examples=model.corpus_count, epochs=model.epochs)
-
-# def entrenar_modelo_con_documentos_carpetas(lista):
-#     for carpeta_pequeña in lista:
-#         # Construir la ruta completa a la carpeta
-#         carpeta_completa = os.path.join("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset", carpeta_pequeña)
-#         files = [f for f in os.listdir(carpeta_completa)]
-#         start_time = time.time()
-#         print("Carpeta completa: ", carpeta_completa)
-#         for f_json in files:
-#             print("Nombre json: ", f_json)
-#             nombre = os.path.join(carpeta_completa, f_json)
-#             print("Nombre completo: ", str(nombre))
-#             for parrafo in  ObtenerParrafos(nombre):
-#                 print(parrafo[0])
-#             # entrenar_con_cuerpo_json(nombre)
-#     print("--- %s seconds ---" % (time.time() - start_time))
-            
-    
-#-----------------------------------------------------------------
-
-# def entrenar_con_cuerpo_json(json_file):
-#     with open(json_file, "r") as f:
-#         datos = f.readlines()
-#         # Itera sobre cada línea del archivo JSONL
-#         for line in datos:
-#             # Carga el JSON de la línea actual
-#             line_json = json.loads(line)
-#             # Extrae los campos a indexar
-#             body = line_json["body_text"]
-#             for obj in body:
-#                 # cojo el parrafo, que sera de tipo string
-#                 texto = limpiar_texto_entrenar(obj["text"])
-#                 # Procesar el texto y la cita con el modelo de spaCy
-#                 texto_procesado = nlp(texto)
-#                 # Obtener todas las palabras alfabéticas detectadas por spaCy
-#                 obtained_text_words = [token.text for token in texto_procesado if token.is_alpha]
-#                 print(type(obtained_text_words))
-#                 yield obtained_text_words
-                
-
-
-#-----------------------------------------------------------------
-
 
 def limpiar_texto_entrenar(texto):
     # Eliminar secuencias de números y letras seguidos
@@ -197,53 +87,42 @@ def limpiar_texto_entrenar(texto):
     # Devolver el texto limpio como un solo string
     return texto_limpio.strip()
 
+class ObtenerParrafos(object):
+    def __init__(self, directorio_raiz):
+        self.directorio_raiz = directorio_raiz
+
+    def __iter__(self):
+        for carpeta in os.listdir(self.directorio_raiz):
+            carpeta_completa = os.path.join(self.directorio_raiz, carpeta)
+            for fjson in os.listdir(carpeta_completa):
+                json_completo = os.path.join(carpeta_completa, fjson)
+                with open(json_completo, 'r') as f:
+                    for line in f:
+                        line_json = json.loads(line)
+                        # Extrae los campos a indexar
+                        body = line_json["body_text"]
+                        for obj in body:
+                            # cojo el parrafo, que sera de tipo string
+                            texto = limpiar_texto_entrenar(obj["text"])
+                            # Procesar el texto y la cita con el modelo de spaCy
+                            texto_procesado = nlp(texto)
+                            # Obtener todas las palabras alfabéticas detectadas por spaCy
+                            obtained_text_words = [token.text for token in texto_procesado if token.is_alpha]
+                            # print(obtained_text_words[0])
+                            yield obtained_text_words
+
+mis_palabras = ObtenerParrafos("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/pruebas_entrenamiento")
+
+model = Word2Vec(min_count=1)
+
+# Construir vocabulario
+model.build_vocab(mis_palabras)
+
+# Entrenar el modelo
+model.train(mis_palabras, total_examples=model.corpus_count, epochs=model.epochs)
+
+nombre_modelo_bin = "modelo_entrenado.bin"
+model.wv.save_word2vec_format(nombre_modelo_bin, binary=True)
 
 
 
-# def main():
-#     # client = ElasticsearchClient()
-#     # lista_tokens_texto = client.obtener_tokens_cuerpo("indice_1","1203.1858", "../datos/archivo.txt")
-#     # texto_cita_limpio = TextProcessor.limpiar_texto(" Finally, our conclusions and future work appear in Section 6 methods [18 ]) and learned (e.g., distributional measures that esti-mate semantic relatedness between terms using a multidimensional space model to correlate words and textual contexts [ 25])")
-#     # texto_cita_limpio = ' '.join(texto_cita_limpio)
-#     # lista_tokens_cita = TextProcessor.obtain_list_english_words_from_body(texto_cita_limpio)
-#     # obtener_similitud_entre_cita_y_articulo(lista_tokens_cita, lista_tokens_texto)
-#     # #Similitud entre la cita y el artículo: 0.85897756
-#     client = ElasticsearchClient()
-#     start_time = time.perf_counter()
-#     documentos_principio, documentos_final = client.obtener_paper_ids("indice_1")
-#     print("Primeros 10 documentos:", documentos_principio)
-#     print("Últimos 10 documentos:", documentos_final)
-#     print("longitud primeros 10 documentos:", len(documentos_principio))
-#     print("longitud últimos 10 documentos:", len(documentos_final))
-#     tokens_documentos = []
-#     # Obtener tokens para los primeros 10 documentos
-#     for documento in documentos_principio:
-#         tokens_documento = client.obtener_tokens_cuerpo("indice_1", documento, "tokens10primeros.txt")
-#         tokens_documentos.append(tokens_documento)
-
-#     # Obtener tokens para los últimos 10 documentos
-#     for documento in documentos_final:
-#         tokens_documento = client.obtener_tokens_cuerpo("indice_1", documento, "tokens10ultimos.txt")
-#         tokens_documentos.append(tokens_documento)
-
-#     print("Tokens de todos los documentos:", tokens_documentos)
-#     print("Longitud de lista de listas:", len(tokens_documentos))
-#     end_time = time.perf_counter()
-#     tamanio_bytes = sys.getsizeof(tokens_documentos)
-#     print("Tamaño de la lista en bytes:", tamanio_bytes, "bytes")
-#     print("tiempo dedicado:", end_time - start_time, "segundos")
-#     print("tamaño: %d "%(calcular_tam_lista_de_listas(tokens_documentos)))
-#     entrenar_modelo_word2vec(tokens_documentos, 'modelo_entrenado_4_documentos.bin') # Entrenar modelo Word2Vec con los tokens de los documentos
-#     #-------------------
-#     lista_tokens_texto = client.obtener_tokens_cuerpo("indice_1","1203.1858", "../datos/archivo.txt")
-#     texto_cita_limpio = TextProcessor.limpiar_texto(" kk de la vaca es una mierda noseque")
-#     texto_cita_limpio = ' '.join(texto_cita_limpio)
-#     lista_tokens_cita = TextProcessor.obtain_list_english_words_from_body(texto_cita_limpio)
-#     obtener_similitud_entre_cita_y_articulo(lista_tokens_cita, lista_tokens_texto, 'modelo_entrenado_4_documentos.bin')
-
-
-
-# main()
-
-
-# entrenar_modelo_con_documentos_carpetas(lista_prueba)

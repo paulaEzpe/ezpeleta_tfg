@@ -171,7 +171,7 @@ def insertar_carpeta(client, index_name, lista):
             insertados += insertar_json_serializado(client, index_name, nombre)
     print("--- %s seconds ---" % (time.time() - start_time))
     print("--- %d insertados ---" % (insertados))
-    
+
 #-----------------------------------------------------------------
 
 def insertar_json_serializado(client, index_name, json_file):

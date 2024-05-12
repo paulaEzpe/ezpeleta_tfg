@@ -88,41 +88,70 @@ def limpiar_texto_entrenar(texto):
     return texto_limpio.strip()
 
 class ObtenerParrafos(object):
-    def __init__(self, directorio_raiz):
+    def __init__(self, directorio_raiz, archivo_salida):
         self.directorio_raiz = directorio_raiz
+        self.archivo_salida = archivo_salida
 
     def __iter__(self):
-        for carpeta in os.listdir(self.directorio_raiz):
-            carpeta_completa = os.path.join(self.directorio_raiz, carpeta)
-            for fjson in os.listdir(carpeta_completa):
-                json_completo = os.path.join(carpeta_completa, fjson)
-                with open(json_completo, 'r') as f:
-                    for line in f:
-                        line_json = json.loads(line)
-                        # Extrae los campos a indexar
-                        body = line_json["body_text"]
-                        for obj in body:
-                            # cojo el parrafo, que sera de tipo string
-                            texto = limpiar_texto_entrenar(obj["text"])
-                            # Procesar el texto y la cita con el modelo de spaCy
-                            texto_procesado = nlp(texto)
-                            # Obtener todas las palabras alfabéticas detectadas por spaCy
-                            obtained_text_words = [token.text for token in texto_procesado if token.is_alpha]
-                            # print(obtained_text_words[0])
-                            yield obtained_text_words
+        carpetas_usadas = []
+        with open(self.archivo_salida, 'w') as txt_file:
+            for carpeta in os.listdir(self.directorio_raiz):
+                carpeta_completa = os.path.join(self.directorio_raiz, carpeta)
+                print("Iterando en la carpeta:", carpeta_completa)
+                txt_file.write(carpeta_completa + '\n')
+                if carpeta_completa in carpetas_usadas:
+                    print("Carpeta ya usada:", carpetas_usadas)
+                    sys.exit()
+                else:
+                    carpetas_usadas.append(carpeta)
+                    print("Carpetas usada:", carpetas_usadas)
+                for fjson in os.listdir(carpeta_completa):
+                    json_completo = os.path.join(carpeta_completa, fjson)
+                    print("JSON file:", json_completo)
+                    with open(json_completo, 'r') as f:
+                        i = 0
+                        for line in f:
+                            line_json = json.loads(line)
+                            i+=1
+                            print("Iterando en el JSON:", i)
+                            # Extrae los campos a indexar
+                            body = line_json["body_text"]
+                            for obj in body:
+                                # cojo el parrafo, que sera de tipo string
+                                texto = limpiar_texto_entrenar(obj["text"])
+                                # Procesar el texto y la cita con el modelo de spaCy
+                                texto_procesado = nlp(texto)
+                                # Obtener todas las palabras alfabéticas detectadas por spaCy
+                                obtained_text_words = [token.text for token in texto_procesado if token.is_alpha]
+                                # print(obtained_text_words[0])
+                                yield obtained_text_words
 
-mis_palabras = ObtenerParrafos("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/pruebas_entrenamiento")
 
-model = Word2Vec(min_count=1)
+mis_palabras = ObtenerParrafos("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/pequena", "carpetas.txt")
 
+model = Word2Vec(sentences=mis_palabras,
+                    vector_size=50,
+                    window=5,
+                    hs=0, #0=negative sampling
+                    sg=1, #1=skip-gram
+                    shrink_windows=True, #draw window size from uniform [1,window]
+                    negative=10,
+                    ns_exponent=0.75,
+                    min_count=3,
+                    workers=1,
+                    seed=1,
+                    epochs=3)
+start_time = time.time()
 # Construir vocabulario
 model.build_vocab(mis_palabras)
-
+print("Model epochs: ", model.epochs)
 # Entrenar el modelo
 model.train(mis_palabras, total_examples=model.corpus_count, epochs=model.epochs)
+#model.epochs=5 by default
 
 nombre_modelo_bin = "modelo_entrenado.bin"
 model.wv.save_word2vec_format(nombre_modelo_bin, binary=True)
-
+elapsed_time = time.time() - start_time
+print("Tiempo transcurrido durante el entrenamiento:", elapsed_time, "segundos")
 
 

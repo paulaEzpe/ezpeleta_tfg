@@ -108,7 +108,7 @@ class TextProcessor:
 
         return longest
 
-    #---------------------------------------------------
+    #########################Algoritmo KMP###########################
 
     @staticmethod
     def compute_prefix_function(pattern):

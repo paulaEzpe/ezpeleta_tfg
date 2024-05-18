@@ -214,17 +214,6 @@ def insertar_json_serializado(client, index_name, json_file):
     print("Data inserted successfully.")
     return i
 
-#-----------------------------------------------------------------
-
-
-def obtener_numero_campos_ocupados(client, index_name):
-    # Obtener el mapping del índice
-    mapping = client.indices.get_mapping(index=index_name)
-
-    # Contar el número de campos en el mapping
-    numero_campos_ocupados = len(mapping[index_name]["mappings"]["properties"])
-
-    return numero_campos_ocupados
 
 #-----------------------------------------------------------------
 
@@ -273,32 +262,7 @@ def crear_indice(indice, client):
     print("Se ha creado el índice")
     return response
 
-#-----------------------------------------------------------------
 
-# # Set up the opensearch-py version of the document
-# Movie.init(using=client)
-# doc = Movie(meta={'id': 1}, title='Moneyball', director='Bennett Miller', year='2011')
-# response = doc.save(using=client)
-
-
-
-# s = Search(using=client, index="my-dsl-index2") \
-#     .filter("term", year="2011") \
-#     .query("match", title="Moneyball")
-
-# response = s.execute()
-
-
-# new_settings = {
-#     "index.mapping.total_fields.limit": 20000  # Define el nuevo límite de campos totales
-# }
-
-# Actualiza la configuración del índice
-#client.indices.put_settings(index=index_name, body=new_settings)
-
-#print(f"Updated total fields limit for index '{index_name}'.")
-#json_file = "../datos/un_json.jsonl"
-#insertar_json(client, index_name, json_file)
 
 #-----------------------------------------------------------------
 
@@ -521,26 +485,6 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
         
 
 #-----------------------------------------------------
-
-def limpiar_texto(texto):
-    # Eliminar secuencias de números y letras seguidos
-    texto_limpio = re.sub(r'\b\w+\d+\w*\b', '', texto.lower())
-    # Eliminar caracteres no alfanuméricos y convertir a minúsculas
-    texto_limpio = re.sub(r'[^\w\s]', '', texto_limpio)
-    # Dividir el texto en palabras
-    palabras = texto_limpio.split()
-    return palabras
-
-
-#---------------------------------------------------------
-
-def extraer_citas(texto):
-    # Expresión regular para encontrar citas
-    patron = r'\{\{cite:[^\}]+\}\}'
-    # Encontrar todas las coincidencias de la expresión regular en el texto
-    citas_encontradas = re.findall(patron, texto)
-    # Retornar las citas encontradas
-    return citas_encontradas
 
 
 ###################################################

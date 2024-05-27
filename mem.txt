@@ -92,3 +92,30 @@ pip3 install torch --break-system-packages
 pip3 install sentence_transformers --break-system-packages
 
 
+El tiempo de entrenamiento de un modelo de Word2Vec no escala de manera lineal con el aumento de la dimensionalidad del vector. Sin embargo, hay algunas consideraciones generales que pueden ayudarte a estimar el tiempo de entrenamiento.
+
+    Complejidad Computacional: La complejidad computacional de entrenar un modelo de Word2Vec aumenta con la dimensionalidad del vector. Específicamente, el tiempo de entrenamiento puede crecer de manera cuadrática con la dimensionalidad en el peor de los casos, aunque esto puede variar dependiendo de la implementación y las optimizaciones específicas del algoritmo.
+
+    Recursos Computacionales: La cantidad de recursos computacionales disponibles, como la CPU, la memoria y la capacidad de paralelización, también afecta significativamente el tiempo de entrenamiento.
+
+    Tamaño del Corpus: El tamaño del corpus de entrenamiento también es un factor importante. Un corpus más grande requerirá más tiempo de procesamiento.
+
+Estimación Aproximada
+
+Dado que mencionaste que entrenar un modelo con una dimensionalidad de 50 tomó 89 horas, y asumiendo una relación cuadrática simplificada (aunque en la práctica puede variar), puedes usar la siguiente fórmula para una estimación aproximada:
+
+Tiempo nuevo≈Tiempo original×(Nueva dimensionalidadDimensionalidad original)2Tiempo nuevo≈Tiempo original×(Dimensionalidad originalNueva dimensionalidad​)2
+
+En tu caso:
+
+Tiempo nuevo≈89 horas×(20050)2Tiempo nuevo≈89 horas×(50200​)2
+Tiempo nuevo≈89 horas×(4)2Tiempo nuevo≈89 horas×(4)2
+Tiempo nuevo≈89 horas×16Tiempo nuevo≈89 horas×16
+Tiempo nuevo≈1424 horasTiempo nuevo≈1424 horas
+Consideraciones Finales
+
+    Optimización: Hay optimizaciones posibles que pueden reducir significativamente el tiempo de entrenamiento, como el uso de técnicas de sampling negativo, ventanas de contexto más pequeñas, o hardware más potente.
+
+    Paralelización: Asegúrate de usar la capacidad de paralelización de Word2Vec (como el parámetro workers en Gensim) para aprovechar múltiples núcleos de CPU.
+
+    Validación Práctica: La fórmula proporcionada es una estimación teórica. En la práctica, te recomiendo realizar una prueba con una dimensionalidad intermedia para obtener una mejor estimación basada en tu configuración específica.

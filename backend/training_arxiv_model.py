@@ -85,7 +85,7 @@ def main_reentrenar(dir,fichModeloEntrenado,fichModeloReentrenado):
 #------------------------------------
 def main_entrenar(dir,fichModeloEntrenado):
     mis_palabras = ObtenerParrafos(dir)
-    model = gensim.models.Word2Vec(vector_size=50,
+    model = gensim.models.Word2Vec(vector_size=50, #cambiar a 200
                         window=5,
                         hs=0, #0=negative sampling
                         sg=1, #1=skip-gram

@@ -4,4 +4,5 @@ backend/flask_session/
 backend/__pycache__/
 datos/*.pdf
 datos/*.bin
+datos/*.npy
 

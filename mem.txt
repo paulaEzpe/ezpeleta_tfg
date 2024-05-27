@@ -83,3 +83,12 @@ Data inserted successfully.
     dentro del de texto, los algoritmos para comprobar si una cita esta contenida en un parrafo y la comparacion de tiempos de estos???
     toda la parte que estoy haciendo ahora de entrenar el modelo para saber a partir de una cita y una referencia si te vale con leerte el titulo y abstract o no¿¿¿
 
+all words: https://www.academicvocabulary.info/download.asp
+
+
+se han usado estos modulos:
+pip3 install transformers --break-system-packages
+pip3 install torch --break-system-packages
+pip3 install sentence_transformers --break-system-packages
+
+

@@ -23,14 +23,22 @@ def getInput():
     return input()
 #-----------------------------------
 # https://stackoverflow.com/questions/8897593/how-to-compute-the-similarity-between-two-text-documents
+
 def obtener_similitud_entre_cita_y_articulo(tokens_cita, tokens_articulo, modelo, vocabulary):
     # Obtener vectores de palabras para la cita
     vectores_cita = []
+    numero_cita_desconocidas = 0
+    numero_vector_desconocidas = 0
+    numero_cita_conocidas = 0
+    numero_vector_conocidas = 0
+    vectores_cita = []
     for token in tokens_cita:
         try:
-            vector = modelo[token]
+            numero_cita_conocidas += 1
+            vector = modelo[token]  # Aquí se corrige la línea
             vectores_cita.append(vector)
         except KeyError:
+            numero_cita_desconocidas += 1
             # Manejar palabras desconocidas
             pass
 
@@ -38,23 +46,31 @@ def obtener_similitud_entre_cita_y_articulo(tokens_cita, tokens_articulo, modelo
     vectores_articulo = []
     for token in tokens_articulo:
         try:
-            vector = modelo[token]
+            numero_vector_conocidas += 1
+            vector = modelo[token]  # Aquí se corrige la línea
             vectores_articulo.append(vector)
         except KeyError:
+            numero_vector_desconocidas += 1
+            print("Palabra desconocida: %s" % token)
             # Manejar palabras desconocidas
             pass
 
     # Promediar vectores de palabras para obtener representaciones vectoriales de la cita y el artículo
-    if not vectores_cita or not vectores_articulo:
-        return 0  # Evita división por cero si no hay vectores válidos
-
     representacion_cita = np.mean(vectores_cita, axis=0)
     representacion_articulo = np.mean(vectores_articulo, axis=0)
     
     # Ahora se compara la similitud entre las representaciones vectoriales de la cita y el artículo, usando el coseno
     similitud = dot(representacion_cita, representacion_articulo) / (norm(representacion_cita) * norm(representacion_articulo))
-
+    print("Palabras conocidas en la cita: %d" % numero_cita_conocidas)
+    print("Palabras desconocidas en la cita: %d" % numero_cita_desconocidas)
+    print("Palabras totales en la cita: %d" % len(tokens_cita))
+    print("Palabras conocidas en el artículo: %d" % numero_vector_conocidas)
+    print("Palabras desconocidas en el artículo: %d" % numero_vector_desconocidas)
+    print("Palabras totales en el artículo: %d" % len(tokens_articulo))
+    print("Porcentaje de desconocidas en la cita: %f" % (numero_cita_desconocidas / len(tokens_cita)))
+    print("Porcentaje de desconocidas en el artículo: %f" % (numero_vector_desconocidas / len(tokens_articulo)))
     return similitud
+
 #-----------------------------------
 def main_1(model):
     pal = getInput()

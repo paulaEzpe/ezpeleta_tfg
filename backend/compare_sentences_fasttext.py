@@ -31,11 +31,18 @@ def getInput():
 def obtener_similitud_entre_cita_y_articulo(tokens_cita, tokens_articulo, modelo, vocabulary):
     # Obtener vectores de palabras para la cita
     vectores_cita = []
+    numero_cita_desconocidas = 0
+    numero_vector_desconocidas = 0
+    numero_cita_conocidas = 0
+    numero_vector_conocidas = 0
     for token in tokens_cita:
         try:
+            numero_cita_conocidas += 1
             vector = modelo.get_word_vector(token)
             vectores_cita.append(vector)
         except KeyError:
+            numero_cita_desconocidas += 1
+            print("Palabra desconocida")
             # Manejar palabras desconocidas
             pass
 
@@ -43,10 +50,13 @@ def obtener_similitud_entre_cita_y_articulo(tokens_cita, tokens_articulo, modelo
     vectores_articulo = []
     for token in tokens_articulo:
         try:
+            numero_vector_conocidas += 1
             vector = modelo.get_word_vector(token)
             vectores_articulo.append(vector)
         except KeyError:
             # Manejar palabras desconocidas
+            numero_vector_desconocidas += 1
+            print("Palabra desconocida")
             pass
 
     # Promediar vectores de palabras para obtener representaciones vectoriales de la cita y el artículo
@@ -55,7 +65,12 @@ def obtener_similitud_entre_cita_y_articulo(tokens_cita, tokens_articulo, modelo
     
     # Ahora se compara la similitud entre las representaciones vectoriales de la cita y el artículo, usando el coseno
     similitud = dot(representacion_cita, representacion_articulo) / (norm(representacion_cita) * norm(representacion_articulo))
-
+    print("Palabras conocidas en la cita: %d" % numero_cita_conocidas)
+    print("Palabras totales en la cita: %d" % len(tokens_cita))
+    print("Palabras conocidas en el artículo: %d" % numero_vector_conocidas)
+    print("Palabras totales en el artículo: %d" % len(tokens_articulo))
+    print("Porcentaje de desconocidas en la cita: %f" % (numero_cita_desconocidas / len(tokens_cita)))
+    print("Porcentaje de desconocidas en el artículo: %f" % (numero_vector_desconocidas / len(tokens_articulo)))
     return similitud
 
 #-----------------------------------
@@ -77,7 +92,7 @@ def show_results(scores):
 #-----------------------------------
 
 def main_2(model):
-    s1 = ['In this chapter we introduce mechanisms for declaring new types and classes in Haskell. We start with three approaches to declaring types, then consider recursive types, show how to declare classes and their instances, and conclude by developing a tautology checker and an abstract machine']
+    s1 = ['In this chapter we introduce mechanisms for declaring new types and classes in Haskell. We start with three approaches to declaring types, then consider recursive types, show how to declare classes and their instances, and conclude by developing a tautology checker and an abstract machine sdfkhsirufgis']
     
     s2 = [
         'In this chapter, we explore methods for defining new types and classes in Haskell. We begin with three techniques for declaring types, followed by a discussion on recursive types. Next, we demonstrate how to declare classes and their instances. Finally, we conclude by creating a tautology checker and an abstract machine',

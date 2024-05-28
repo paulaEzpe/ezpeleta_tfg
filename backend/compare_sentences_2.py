@@ -35,7 +35,8 @@ def show_results(scores):
     for i in range(len(scores)):
         s = scores[i]
         print("(%d,%d): %f"%(s[0][0],s[0][1],s[1]))
-#----------------------------------------------------------
+#---------------------------------------------------------
+
 #Compute embedding for both lists
 embeddings1 = model.encode(s1, convert_to_tensor=True)
 embeddings2 = model.encode(s2, convert_to_tensor=True)

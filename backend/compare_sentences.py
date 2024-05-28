@@ -71,16 +71,31 @@ def get():
     sys.stdout.write('--> ')
     return input()
 #----------------------------------------------------------
+
+def get_out_of_vocabulary_words_list(tokenizer, texts):
+    out_of_vocab_words = []
+    for text in texts:
+        tokens = tokenizer.tokenize(text)
+        out_of_vocab_words.extend([token for token in tokens if token not in tokenizer.vocab])
+    return out_of_vocab_words
+
+
+#----------------------------------------------------------
+
+
 def show_results(scores):
     for i in range(len(scores)):
         s = scores[i]
         print("(%d,%d): %f"%(s[0][0],s[0][1],s[1]))
 #----------------------------------------------------------
+
+
+
 if __name__ == "__main__":
     s1 = "John loves dogs" 
     s2 = "dogs love John"
 
-    s1 = ['In this chapter we introduce mechanisms for declaring new types and classes in Haskell. We start with three approaches to declaring types, then consider recursive types, show how to declare classes and their instances, and conclude by developing a tautology checker and an abstract machine']
+    s1 = ['In this chapter we introduce mechanisms for declaring new types and classes in Haskell. We start with three approaches to declaring types, then consider recursive types, show how to declare classes and their instances, and conclude by developing a tautology checker and an abstract machine drgfhegoh 2345746576']
 
     s2 = [
     'In this chapter, we explore methods for defining new types and classes in Haskell. We begin with three techniques for declaring types, followed by a discussion on recursive types. Next, we demonstrate how to declare classes and their instances. Finally, we conclude by creating a tautology checker and an abstract machine',
@@ -122,4 +137,13 @@ if __name__ == "__main__":
             scores[(i,j)] = cos_sim[0][0]
     sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
     show_results(sorted_scores)
+
+    out_of_vocab_words_s1 = get_out_of_vocabulary_words_list(tokenizer, s1)
+    # out_of_vocab_words_s2 = get_out_of_vocabulary_words_list(tokenizer, s2)
+    print("Palabras fuera del vocabulario en s1:", out_of_vocab_words_s1)
+    # print("Palabras fuera del vocabulario en s2:", out_of_vocab_words_s2)
+
+    for i in range (len(s2)):
+        out_of_vocab_words_s2 = get_out_of_vocabulary_words_list(tokenizer, s2[i])
+        print("Palabras fuera del vocabulario en s2:", out_of_vocab_words_s2)
     

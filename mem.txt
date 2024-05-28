@@ -119,3 +119,238 @@ Consideraciones Finales
     Paralelización: Asegúrate de usar la capacidad de paralelización de Word2Vec (como el parámetro workers en Gensim) para aprovechar múltiples núcleos de CPU.
 
     Validación Práctica: La fórmula proporcionada es una estimación teórica. En la práctica, te recomiendo realizar una prueba con una dimensionalidad intermedia para obtener una mejor estimación basada en tu configuración específica.
+
+
+---------------------------------
+
+MODELO GOOGLE:
+
+(w,dim): (3000000,300)
+Palabra desconocida: chapter,
+Palabra desconocida: and
+Palabra desconocida: Haskell.
+Palabra desconocida: types,
+Palabra desconocida: a
+Palabra desconocida: types.
+Palabra desconocida: Next,
+Palabra desconocida: to
+Palabra desconocida: and
+Palabra desconocida: instances.
+Palabra desconocida: Finally,
+Palabra desconocida: a
+Palabra desconocida: and
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 11
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 51
+Palabras desconocidas en el artículo: 13
+Palabras totales en el artículo: 51
+Porcentaje de desconocidas en la cita: 0.244444
+Porcentaje de desconocidas en el artículo: 0.254902
+Palabra desconocida: to
+Palabra desconocida: and
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 11
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 11
+Palabras desconocidas en el artículo: 2
+Palabras totales en el artículo: 11
+Porcentaje de desconocidas en la cita: 0.244444
+Porcentaje de desconocidas en el artículo: 0.181818
+Palabra desconocida: to
+Palabra desconocida: and
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 11
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 10
+Palabras desconocidas en el artículo: 2
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.244444
+Porcentaje de desconocidas en el artículo: 0.200000
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 11
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 10
+Palabras desconocidas en el artículo: 0
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.244444
+Porcentaje de desconocidas en el artículo: 0.000000
+Palabra desconocida: of
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 11
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 9
+Palabras desconocidas en el artículo: 1
+Palabras totales en el artículo: 9
+Porcentaje de desconocidas en la cita: 0.244444
+Porcentaje de desconocidas en el artículo: 0.111111
+Palabra desconocida: of
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 11
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 10
+Palabras desconocidas en el artículo: 1
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.244444
+Porcentaje de desconocidas en el artículo: 0.100000
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 11
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 3
+Palabras desconocidas en el artículo: 0
+Palabras totales en el artículo: 3
+Porcentaje de desconocidas en la cita: 0.244444
+Porcentaje de desconocidas en el artículo: 0.000000
+(0,0): 0.958956
+(0,3): 0.864859
+(0,1): 0.757558
+(0,2): 0.748385
+(0,4): 0.678292
+(0,5): 0.667337
+(0,6): 0.504121
+
+
+
+MODELO PAULA SIN WORKERS:
+
+(w,dim): (771416,50)
+Palabra desconocida: In
+Palabra desconocida: chapter,
+Palabra desconocida: Haskell.
+Palabra desconocida: We
+Palabra desconocida: types,
+Palabra desconocida: types.
+Palabra desconocida: Next,
+Palabra desconocida: instances.
+Palabra desconocida: Finally,
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 6
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 51
+Palabras desconocidas en el artículo: 9
+Palabras totales en el artículo: 51
+Porcentaje de desconocidas en la cita: 0.133333
+Porcentaje de desconocidas en el artículo: 0.176471
+Palabra desconocida: He
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 6
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 11
+Palabras desconocidas en el artículo: 1
+Palabras totales en el artículo: 11
+Porcentaje de desconocidas en la cita: 0.133333
+Porcentaje de desconocidas en el artículo: 0.090909
+Palabra desconocida: They
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 6
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 10
+Palabras desconocidas en el artículo: 1
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.133333
+Porcentaje de desconocidas en el artículo: 0.100000
+Palabra desconocida: In
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 6
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 10
+Palabras desconocidas en el artículo: 1
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.133333
+Porcentaje de desconocidas en el artículo: 0.100000
+Palabra desconocida: It
+Palabra desconocida: Haskell
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 6
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 9
+Palabras desconocidas en el artículo: 2
+Palabras totales en el artículo: 9
+Porcentaje de desconocidas en la cita: 0.133333
+Porcentaje de desconocidas en el artículo: 0.222222
+Palabra desconocida: It
+Palabra desconocida: Haskell
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 6
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 10
+Palabras desconocidas en el artículo: 2
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.133333
+Porcentaje de desconocidas en el artículo: 0.200000
+Palabra desconocida: This
+Palabras conocidas en la cita: 45
+Palabras desconocidas en la cita: 6
+Palabras totales en la cita: 45
+Palabras conocidas en el artículo: 3
+Palabras desconocidas en el artículo: 1
+Palabras totales en el artículo: 3
+Porcentaje de desconocidas en la cita: 0.133333
+Porcentaje de desconocidas en el artículo: 0.333333
+(0,0): 0.994425
+(0,3): 0.972769
+(0,1): 0.931238
+(0,5): 0.925659
+(0,4): 0.924380
+(0,2): 0.914397
+(0,6): 0.733072
+
+
+
+MODELO FASTTEXT:
+
+Dimensión del modelo: 300
+Palabras conocidas en la cita: 46
+Palabras totales en la cita: 46
+Palabras conocidas en el artículo: 51
+Palabras totales en el artículo: 51
+Porcentaje de desconocidas en la cita: 0.000000
+Porcentaje de desconocidas en el artículo: 0.000000
+Palabras conocidas en la cita: 46
+Palabras totales en la cita: 46
+Palabras conocidas en el artículo: 11
+Palabras totales en el artículo: 11
+Porcentaje de desconocidas en la cita: 0.000000
+Porcentaje de desconocidas en el artículo: 0.000000
+Palabras conocidas en la cita: 46
+Palabras totales en la cita: 46
+Palabras conocidas en el artículo: 10
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.000000
+Porcentaje de desconocidas en el artículo: 0.000000
+Palabras conocidas en la cita: 46
+Palabras totales en la cita: 46
+Palabras conocidas en el artículo: 10
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.000000
+Porcentaje de desconocidas en el artículo: 0.000000
+Palabras conocidas en la cita: 46
+Palabras totales en la cita: 46
+Palabras conocidas en el artículo: 9
+Palabras totales en el artículo: 9
+Porcentaje de desconocidas en la cita: 0.000000
+Porcentaje de desconocidas en el artículo: 0.000000
+Palabras conocidas en la cita: 46
+Palabras totales en la cita: 46
+Palabras conocidas en el artículo: 10
+Palabras totales en el artículo: 10
+Porcentaje de desconocidas en la cita: 0.000000
+Porcentaje de desconocidas en el artículo: 0.000000
+Palabras conocidas en la cita: 46
+Palabras totales en la cita: 46
+Palabras conocidas en el artículo: 3
+Palabras totales en el artículo: 3
+Porcentaje de desconocidas en la cita: 0.000000
+Porcentaje de desconocidas en el artículo: 0.000000
+(0,0): 0.982578
+(0,3): 0.883266
+(0,1): 0.823928
+(0,2): 0.821448
+(0,5): 0.816599
+(0,4): 0.804070
+(0,6): 0.594541
+
+
+---------------------------------
+
+SE VA A HACER EL ENTRENAMIENTO CON VARIOS WORKERS EN PARALELO A PARTIR DE UN TXT

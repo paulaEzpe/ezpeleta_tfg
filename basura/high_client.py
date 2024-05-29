@@ -1,10 +1,9 @@
-"""
+"""-------------------------------------------------------------------------
 Nombre del archivo: high_client.py
-Autora: Paula Ezpeleta Castrillo
-Fecha de creación: 24/03/2024
-Descripción: Archivo que contiene el código necesario para todas las operaciones con OpenSearch
-
-"""
+Autora:             Paula Ezpeleta Castrillo
+Fecha de creación:  24/03/2024
+Descripción:        Archivo que contiene el código necesario para todas las operaciones con OpenSearch
+-------------------------------------------------------------------------"""
 
 # http://localhost:5601/
 # buscar en todos los archivos del directorio actual: grep -nr "texto" .

@@ -1,3 +1,11 @@
+"""-------------------------------------------------------------------------
+Nombre del archivo: compare_sentences_2.py
+Autora:             Paula Ezpeleta Castrillo
+Fecha de creación:  15/05/2024
+Descripción:        Codigo necesario para la comparación de similitud entre textos usando sentence-transformers y BERT
+-------------------------------------------------------------------------"""
+
+
 
 # https://stackoverflow.com/questions/60492839/how-to-compare-sentence-similarities-using-embeddings-from-bert
 # Usando sentence-transformers y BERT (están optimizados específicamente para tareas de similitud de oraciones y pueden proporcionar mejores resultados en comparación con el uso directo de BERT sin ajustes adicionales)

@@ -1,4 +1,11 @@
 
+"""-------------------------------------------------------------------------
+Nombre del archivo: compare_sentences.py
+Autora:             Paula Ezpeleta Castrillo
+Fecha de creación:  15/05/2024
+Descripción:        Codigo necesario para la comparación de similitud entre textos usando mi modelo entrenado
+-------------------------------------------------------------------------"""
+
 # pip install gensim
 import numpy as np
 from gensim.models import KeyedVectors

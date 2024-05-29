@@ -1,3 +1,11 @@
+"""-------------------------------------------------------------------------
+Nombre del archivo: compare_sentences_fasttext.py
+Autora:             Paula Ezpeleta Castrillo
+Fecha de creación:  15/05/2024
+Descripción:        Codigo necesario para la comparación de similitud entre textos usando un modelo entrenado de fasttext
+-------------------------------------------------------------------------"""
+
+
 import fasttext
 import numpy as np
 from numpy import dot

@@ -1,3 +1,10 @@
+"""-------------------------------------------------------------------------
+Nombre del archivo: compare_sentences.py
+Autora:             Paula Ezpeleta Castrillo
+Fecha de creación:  15/05/2024
+Descripción:        Codigo necesario para la comparación de similitud entre textos usando transformers y BERT
+-------------------------------------------------------------------------"""
+
 '''
  Adapted and extended from 
  https://github.com/huggingface/transformers/issues/1950#issuecomment-558679189

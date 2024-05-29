@@ -1,3 +1,10 @@
+"""-------------------------------------------------------------------------
+Nombre del archivo: compare_sentences.py
+Autora:             Paula Ezpeleta Castrillo
+Fecha de creación:  15/05/2024
+Descripción:        Módulo correspondiente a todas las operaciones a realizar con texto
+-------------------------------------------------------------------------"""
+
 import re
 import spacy
 import time

@@ -18,7 +18,7 @@ class ModelProcessor:
     fichModel = '../datos/GoogleNews-vectors-negative300.bin'
     model = KeyedVectors.load_word2vec_format(fichModel, binary=True)
 
-    print("(w,dim): (%d,%d)" % (model.vectors.shape[0], model.vectors.shape[1]))
+    # print("(w,dim): (%d,%d)" % (model.vectors.shape[0], model.vectors.shape[1]))
     # Contains the list of all unique words in pre-trained word2vec vectors
     vocabulary = list(model.key_to_index.keys())
 
@@ -53,7 +53,7 @@ class ModelProcessor:
                 vectores_articulo.append(vector)
             except KeyError:
                 numero_vector_desconocidas += 1
-                print("Palabra desconocida: %s" % token)
+                # print("Palabra desconocida: %s" % token)
                 # Manejar palabras desconocidas
                 pass
 

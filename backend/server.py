@@ -14,7 +14,7 @@ import PyPDF2
 from pdf_processor import PDFProcessor
 from text_processor import TextProcessor
 from elasticsearch_client import ElasticsearchClient
-# from model_processor import ModelProcessor
+from model_processor import ModelProcessor
 
 app = Flask(__name__)
 CORS(app)
@@ -217,12 +217,25 @@ def receive_referenced_json():
         print('Texto seleccionado recibido desde el frontend:', selectedText)
         # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con el modelo y
         # devolver los resultados del modelo
-        # modelP = ModelProcessor()
-        # similitud = modelP.obtener_similitud_entre_cita_y_articulo(referencedjsontext, selectedText, model_processor.model, model_processor.vocabulary)
-        print('Similitud entre la cita y el artículo:', similitud)
-        return jsonify({'message': 'Textos recibidos con éxito'}), 200
-    else:
-        return jsonify({'error': 'No se proporcionaron todos los textos necesarios'}), 400
+        print("Tipo de referencedjsontext:", type(referencedjsontext))
+        print("Tipo de selectedText:", type(selectedText))
+        referencedjsontext_str = str(referencedjsontext)
+        selectedText_str = str(selectedText)
+        textP = TextProcessor()
+        text_words, cite_words = textP.obtain_list_english_words(referencedjsontext_str, selectedText_str)
+        modelP = ModelProcessor()
+        print("Las palabrass de la cita son las siguientes: ", cite_words)
+        similitud = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words, modelP.model, modelP.vocabulary)
+        # Imprimir la similitud por terminal si está definida
+        # Después de calcular la similitud
+        similitud = float(similitud)
+        if similitud is not None:
+            print('Similitud entre la cita y el artículo:', similitud)
+            return jsonify({'message': 'Textos recibidos con éxito', 'similitud': similitud}), 200
+        else:
+            print('No se pudo calcular la similitud entre la cita y el artículo.')
+            return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500
+
 
 ######################################################################################
 

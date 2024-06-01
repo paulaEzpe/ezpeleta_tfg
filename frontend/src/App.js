@@ -27,6 +27,7 @@ function App() {
   const [referenceJsonText, setReferenceJsonText] = useState('');
   const [showModalModelo, setShowModalModelo] = useState(false);
   const [showModalPolaridad, setShowModalPolaridad] = useState(false);
+  const [similitud, setSimilitud] = useState(null);
   
   const handleShowModalModelo = () => {
     setShowModalModelo(true);
@@ -46,11 +47,16 @@ function App() {
         body: JSON.stringify({ referencedjsontextandselectedtext: referenceJsonText, selectedText })
       });
       if (response.ok) {
-        const responseText = await response.text();
-        console.log('Cuerpo del JSON recibido en el backend:', responseText);
+        const responseData = await response.json();
+        console.log('Respuesta del backend:', responseData);
 
-        // Guardar el texto recibido en la variable de estado
-        // setReferenceJsonText(responseText);
+        if (responseData.similitud !== undefined) {
+          // Actualizar el estado con la similitud recibida
+          setSimilitud(responseData.similitud);
+          console.log('Similitud recibida:', responseData.similitud);
+        } else {
+          console.error('El backend no devolvió la similitud esperada.');
+        }
       } else {
         console.error('Error al enviar la cita al backend.');
       }
@@ -58,6 +64,7 @@ function App() {
       console.error('Error al enviar la cita al backend:', error);
     }
   };
+  
 
 
   // Función para finalizar la selección de texto en el pdf una vez el 
@@ -460,6 +467,9 @@ function App() {
             </Modal.Header>
             <Modal.Body>
               This is the content of the modal.
+              {similitud && (
+                <p>Similitud entre la cita y el artículo: {similitud}</p>
+              )}
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseModalModelo}>

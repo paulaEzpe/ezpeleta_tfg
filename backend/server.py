@@ -14,6 +14,7 @@ import PyPDF2
 from pdf_processor import PDFProcessor
 from text_processor import TextProcessor
 from elasticsearch_client import ElasticsearchClient
+# from model_processor import ModelProcessor
 
 app = Flask(__name__)
 CORS(app)
@@ -42,7 +43,9 @@ def init_session():
 #---------------------------------------------------------------------------------------
 
 def modify_paper_id(new_paper_id):
+    print("Modificando el paper_id de: " + str(session['paper_id']) + " a " + str(new_paper_id))
     session['paper_id'] = new_paper_id
+    print("Nuevo paper_id: " + str(session['paper_id']))
 
 def modify_bibliografia(new_bibliografia):
     session['bibliografia'] = new_bibliografia
@@ -200,6 +203,26 @@ def receive_citation_from_frontend():
     #print('Cuerpo del json mandado al frontend:', texto_del_cuerpo_documento_referencia)
     return texto_del_cuerpo_documento_referencia
 
+#------------------------------------------------------------------------------------
+
+# para mandar al backend el texto del json que se ha referenciado para poder usar el modelo
+@app.route('/sendReferencedJsonToBackend', methods=['POST'])
+def receive_referenced_json():
+    data = request.get_json()
+    referencedjsontext = data.get('referencedjsontextandselectedtext')
+    selectedText = data.get('selectedText')
+
+    if referencedjsontext and selectedText:
+        print('Texto JSON recibido desde el frontend:', referencedjsontext)
+        print('Texto seleccionado recibido desde el frontend:', selectedText)
+        # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con el modelo y
+        # devolver los resultados del modelo
+        # modelP = ModelProcessor()
+        # similitud = modelP.obtener_similitud_entre_cita_y_articulo(referencedjsontext, selectedText, model_processor.model, model_processor.vocabulary)
+        print('Similitud entre la cita y el artículo:', similitud)
+        return jsonify({'message': 'Textos recibidos con éxito'}), 200
+    else:
+        return jsonify({'error': 'No se proporcionaron todos los textos necesarios'}), 400
 
 ######################################################################################
 

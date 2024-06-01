@@ -5,6 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'pdfjs-dist/web/pdf_viewer.css';
 import 'pdfjs-dist/build/pdf.worker.min';
 import './App.css';
+import { Button, Form, Modal } from 'react-bootstrap';
 
 
 import {Viewer, Worker} from '@react-pdf-viewer/core'
@@ -24,7 +25,39 @@ function App() {
   const [paragraphText, setParagraphText] = useState('');
   const [filteredCitations, setFilteredCitations] = useState([]);
   const [referenceJsonText, setReferenceJsonText] = useState('');
+  const [showModalModelo, setShowModalModelo] = useState(false);
+  const [showModalPolaridad, setShowModalPolaridad] = useState(false);
   
+  const handleShowModalModelo = () => {
+    setShowModalModelo(true);
+    sendReferencedJsonToBackend();
+  };
+  const handleCloseModalModelo = () => setShowModalModelo(false);
+  const handleShowModalPolaridad = () => setShowModalPolaridad(true);
+  const handleCloseModalPolaridad = () => setShowModalPolaridad(false);
+
+  const sendReferencedJsonToBackend = async () => {
+    try {
+      const response = await fetch('/sendReferencedJsonToBackend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ referencedjsontextandselectedtext: referenceJsonText, selectedText })
+      });
+      if (response.ok) {
+        const responseText = await response.text();
+        console.log('Cuerpo del JSON recibido en el backend:', responseText);
+
+        // Guardar el texto recibido en la variable de estado
+        // setReferenceJsonText(responseText);
+      } else {
+        console.error('Error al enviar la cita al backend.');
+      }
+    } catch (error) {
+      console.error('Error al enviar la cita al backend:', error);
+    }
+  };
 
 
   // Función para finalizar la selección de texto en el pdf una vez el 
@@ -63,6 +96,8 @@ function App() {
           setBibliographyText('');
           setTextInput('');
           setParagraphText('');
+          setFilteredCitations([]);
+          setReferenceJsonText('');
           const response = await fetch('/uploadSelectedText', {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
@@ -165,6 +200,8 @@ function App() {
         console.error('Error al enviar la cita al backend:', error);
     }
   }
+
+  const isTextPresent = referenceJsonText.length > 0;
 
   // async function fetchParagraphFromBackend() {
   //   try {
@@ -298,8 +335,12 @@ function App() {
   const handleInputSubmit = async () => {
     try {
       //ultimo
+      // poner todas las variables de texto a 0
       setBibliographyText('');
       setSelectedText('');
+      setParagraphText('');
+      setFilteredCitations([]);
+      setReferenceJsonText('');
       const response = await fetch('/uploadInputPdfId', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -410,6 +451,44 @@ function App() {
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}} value={referenceJsonText}
                         onChange={handleTextInputChange} readOnly 
                       />
+          <Button type="button" className="btn btn-lg btn-primary" disabled={!isTextPresent} onClick={handleShowModalModelo}>
+            Primary button
+          </Button>
+          <Modal show={showModalModelo} onHide={handleCloseModalModelo} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Modal modelo</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              This is the content of the modal.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModalModelo}>
+                Close
+              </Button>
+              <Button variant="primary" onClick={handleCloseModalModelo}>
+                Save Changes
+              </Button>
+            </Modal.Footer>
+          </Modal>
+          <Button type="button" className="btn btn-secondary btn-lg" disabled={!isTextPresent} onClick={handleShowModalPolaridad}>
+            Button
+          </Button>
+          <Modal show={showModalPolaridad} onHide={handleCloseModalPolaridad} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Modal polaridad</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              This is the content of the modal.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModalPolaridad}>
+                Close
+              </Button>
+              <Button variant="primary" onClick={handleCloseModalPolaridad}>
+                Save Changes
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
     </div>

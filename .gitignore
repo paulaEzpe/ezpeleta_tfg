@@ -6,4 +6,5 @@ datos/*.pdf
 datos/*.bin
 datos/*.npy
 datos/*.txt
+backend/*.txt
 

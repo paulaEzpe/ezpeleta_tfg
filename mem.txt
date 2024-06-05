@@ -356,3 +356,12 @@ Porcentaje de desconocidas en el artículo: 0.000000
 ---------------------------------
 
 SE VA A HACER EL ENTRENAMIENTO CON VARIOS WORKERS EN PARALELO A PARTIR DE UN TXT
+
+
+
+resumen y objetivos como subseccion dentro de la introduccion
+quitar disk storage
+
+unir contexto tecnológico y herramientas utilizadas: hablar de todo lo de fasttext, hablar de ontext otecnologico de modelos de lenguaje,
+busquedas. hablar de que es un modelo de lenguaje, de que hemos usando gensim......
+

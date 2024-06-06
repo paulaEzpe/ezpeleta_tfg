@@ -7,12 +7,14 @@ import 'pdfjs-dist/build/pdf.worker.min';
 import './App.css';
 import { Button, Form, Modal } from 'react-bootstrap';
 
-
 import {Viewer, Worker} from '@react-pdf-viewer/core'
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import ListGroup from 'react-bootstrap/ListGroup'
+import DoughnutChartSuscritos from "./components/DoughnutChartSuscritos";
+
+
 
 function App() {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -28,6 +30,8 @@ function App() {
   const [showModalModelo, setShowModalModelo] = useState(false);
   const [showModalPolaridad, setShowModalPolaridad] = useState(false);
   const [similitud, setSimilitud] = useState(null);
+  const modelNames = ['Fasttext model', 'Google model', 'Our model', 'BERT', 'sentence-transformers BERT model'];
+
   
   const handleShowModalModelo = () => {
     setShowModalModelo(true);
@@ -39,31 +43,34 @@ function App() {
 
   const sendReferencedJsonToBackend = async () => {
     try {
-      const response = await fetch('/sendReferencedJsonToBackend', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ referencedjsontextandselectedtext: referenceJsonText, selectedText })
-      });
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Respuesta del backend:', responseData);
+        const response = await fetch('/sendReferencedJsonToBackend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ referencedjsontextandselectedtext: referenceJsonText, selectedText })
+        });
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Respuesta del backend:', responseData);
 
-        if (responseData.similitud !== undefined) {
-          // Actualizar el estado con la similitud recibida
-          setSimilitud(responseData.similitud);
-          console.log('Similitud recibida:', responseData.similitud);
+            if (responseData.similitudes && responseData.similitudes.length > 0) {
+                // Actualizar el estado con las similitudes recibidas
+                setSimilitud(responseData.similitudes);
+                console.log('Similitudes recibidas:', responseData.similitudes);
+            } else {
+                console.error('El backend no devolvió las similitudes esperadas.');
+            }
         } else {
-          console.error('El backend no devolvió la similitud esperada.');
+            console.error('Error al enviar la cita al backend.');
         }
-      } else {
-        console.error('Error al enviar la cita al backend.');
-      }
     } catch (error) {
-      console.error('Error al enviar la cita al backend:', error);
+        console.error('Error al enviar la cita al backend:', error);
     }
   };
+
+
+
   
 
 
@@ -459,43 +466,39 @@ function App() {
                         onChange={handleTextInputChange} readOnly 
                       />
           <Button type="button" className="btn btn-lg btn-primary" disabled={!isTextPresent} onClick={handleShowModalModelo}>
-            Primary button
+            Obtain similarity
           </Button>
           <Modal show={showModalModelo} onHide={handleCloseModalModelo} centered>
-            <Modal.Header closeButton>
-              <Modal.Title>Modal modelo</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              This is the content of the modal.
-              {similitud && (
-                <p>Similitud entre la cita y el artículo: {similitud}</p>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseModalModelo}>
-                Close
-              </Button>
-              <Button variant="primary" onClick={handleCloseModalModelo}>
-                Save Changes
-              </Button>
-            </Modal.Footer>
+            <div className="modal-dialog modal-xl"> {/* Agrega la clase modal-lg aquí */}
+              <Modal.Header closeButton>
+                <Modal.Title>Similarity between cite and referenced paper</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {similitud && similitud.map((sim, index) => (
+                  <h6 key={index}>Similitud {modelNames[index]}: {sim}</h6>
+                ))}
+                <DoughnutChartSuscritos similitudes={similitud} className="chart-container" />
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseModalModelo}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </div>
           </Modal>
           <Button type="button" className="btn btn-secondary btn-lg" disabled={!isTextPresent} onClick={handleShowModalPolaridad}>
-            Button
+            Obtain polarity
           </Button>
           <Modal show={showModalPolaridad} onHide={handleCloseModalPolaridad} centered>
             <Modal.Header closeButton>
-              <Modal.Title>Modal polaridad</Modal.Title>
+              <Modal.Title>Polarity between cite and referenced paper</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              This is the content of the modal.
+              Here goes a gradient bar
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseModalPolaridad}>
                 Close
-              </Button>
-              <Button variant="primary" onClick={handleCloseModalPolaridad}>
-                Save Changes
               </Button>
             </Modal.Footer>
           </Modal>

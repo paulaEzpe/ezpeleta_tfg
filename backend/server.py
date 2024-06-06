@@ -28,6 +28,8 @@ Session(app)
 
 # El nombre del índice de la BD
 index_name = "indice_1"
+# Variable para que cargue los modelos en memoria únicamente una vez
+modelP = ModelProcessor()
 
 #################### Funciones para modificar las variables de sesion ##################
 
@@ -215,7 +217,7 @@ def receive_referenced_json():
     if referencedjsontext and selectedText:
         print('Texto JSON recibido desde el frontend:', referencedjsontext)
         print('Texto seleccionado recibido desde el frontend:', selectedText)
-        # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con el modelo y
+        # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con los modelos y
         # devolver los resultados del modelo
         print("Tipo de referencedjsontext:", type(referencedjsontext))
         print("Tipo de selectedText:", type(selectedText))
@@ -223,15 +225,16 @@ def receive_referenced_json():
         selectedText_str = str(selectedText)
         textP = TextProcessor()
         text_words, cite_words = textP.obtain_list_english_words(referencedjsontext_str, selectedText_str)
-        modelP = ModelProcessor()
-        print("Las palabrass de la cita son las siguientes: ", cite_words)
-        similitud = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words, modelP.model, modelP.vocabulary)
-        # Imprimir la similitud por terminal si está definida
-        # Después de calcular la similitud
-        similitud = float(similitud)
-        if similitud is not None:
-            print('Similitud entre la cita y el artículo:', similitud)
-            return jsonify({'message': 'Textos recibidos con éxito', 'similitud': similitud}), 200
+        print("Las palabras de la cita son las siguientes: ", cite_words)
+        # Obtener similitudes usando todos los modelos
+        similitudes = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words)
+        # Imprimir las similitudes por terminal
+        for i, similitud in enumerate(similitudes):
+            print(f'Similitud entre la cita y el artículo (modelo {i+1}): {similitud}')
+        # Si alguna similitud está definida, devolver el resultado exitosamente
+        similitudes = [float(similitud) for similitud in similitudes]
+        if any(similitudes):
+            return jsonify({'message': 'Textos recibidos con éxito', 'similitudes': similitudes}), 200
         else:
             print('No se pudo calcular la similitud entre la cita y el artículo.')
             return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500

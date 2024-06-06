@@ -65,7 +65,7 @@ client = ElasticsearchClient()
 
 @app.route('/datos/<path:path>')
 def serve_pdf(path):
-    return send_from_directory('/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/web2/datos', path)
+    return send_from_directory('../datos/', path)
 
 # Para recibir el pdf 
 @app.route("/uploadPDFText", methods=["POST"])
@@ -79,6 +79,9 @@ def upload_pdf_text():
         #paper_id = extraer_arxiv(pdf_text)
         modify_paper_id(PDFProcessor.extraer_arxiv(pdf_text))
         print("Id del documento subido:", session['paper_id'])
+        print('Texto del PDF:', pdf_text)
+        pdf_path = PDFProcessor.descargar_pdf_arxiv(session['paper_id'], "../datos/")
+        print("lo he descargadoi sin problemas")
         #####client = conexion()
         #verificar_conexion(client)
         # titulo = obtener_titulo_por_paper_id(client, index_name, session['paper_id'])
@@ -92,7 +95,8 @@ def upload_pdf_text():
         # Guardar el pdf en un .txt
         with open('pdf_text.txt', 'w') as file:
             file.write(pdf_text)
-        return {"message": "Texto del PDF recibido y guardado exitosamente en pdf_text.txt."}
+        return {"pdfUrl": pdf_path,"tituloEncontrado": titulo is not None}
+
 
 #-------------------------------------------------------------------------------------
 
@@ -142,6 +146,10 @@ def save_selected_text():
         # Filtrar el texto seleccionado para ponerlo todo en una linea 
         selected_text = selected_text.replace('\n', ' ')
         print('Texto seleccionado tras sustiruir saltos de linea y guiones:', selected_text)
+        # AQUI HAY QUE GUARDAR EL TEXTO SELECCIONADO EN VARIABLE DE SESION#
+
+
+
         # client = conexion()
         # # Obtener la bibliografía
         # resultado = obtener_bibliografia_texto_parrafo_seleccion(client, index_name, session['paper_id'], selected_text)
@@ -209,6 +217,7 @@ def receive_citation_from_frontend():
 def receive_referenced_json():
     data = request.get_json()
     referencedjsontext = data.get('referencedjsontextandselectedtext')
+    #aqui habria que cogerlo de la variable de sesion en vez de aqui
     selectedText = data.get('selectedText')
 
     if referencedjsontext and selectedText:

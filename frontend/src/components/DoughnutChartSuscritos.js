@@ -52,8 +52,10 @@ const DoughnutChartSuscritos = ({ similitudes }) => {
   };
 
   return (
-    <div className="chart-container">
-      <Bar data={data} options={options} />
+    <div className="chart-wrapper">
+      <div className="chart-container">
+        <Bar data={data} options={options} />
+      </div>
     </div>
   );
 };

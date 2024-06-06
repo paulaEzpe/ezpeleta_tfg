@@ -485,6 +485,112 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
 
 #-----------------------------------------------------
 
+def buscar_referencias_arxiv(client, index_name, paper_id):
+    print("Buscando referencias de arXiv en el documento con paper_id:", paper_id)
+    consulta = {"query": {"match": {"paper_id": paper_id}}}   
+    # Realizar la consulta para obtener el documento específico
+    resultado = client.search(index=index_name, body=consulta)
+    # Obtener el documento específico de los resultados
+    documento_especifico = resultado["hits"]["hits"][0]["_source"]
+
+    # Acceder al campo json_data para obtener el documento serializado
+    documento_serializado = documento_especifico["json_data"]
+
+    # Deserializar el documento serializado para obtener el documento original
+    documento_original = json.loads(documento_serializado)
+
+    # Acceder a las referencias del documento original
+    bibliografia = documento_original["bib_entries"]
+
+    referencias_arxiv = []
+    
+    for key, entry in bibliografia.items():
+        bib_entry_raw = entry["bib_entry_raw"]
+        if "arxiv" in bib_entry_raw.lower():
+            referencias_arxiv.append(bib_entry_raw)
+            print(f"Referencia arXiv encontrada: {bib_entry_raw}")
+    
+    if not referencias_arxiv:
+        print("No se encontraron referencias de arXiv.")
+    return paper_id, referencias_arxiv
+
+
+
+def verificar_referencias_arxiv_en_base_de_datos(client, index_name, referencias_arxiv, file_name, documento):
+    referencias_encontradas = []
+    with open(file_name, 'a') as file:
+        for referencia in referencias_arxiv:
+            # Extraer el identificador de arXiv de la referencia
+            arxiv_id = extraer_arxiv_id(referencia)
+            if arxiv_id:
+                consulta = {"query": {"match": {"paper_id": arxiv_id}}}
+                resultado = client.search(index=index_name, body=consulta)
+                if resultado["hits"]["total"]["value"] > 0:
+                    referencias_encontradas.append(arxiv_id)
+                    print(f"Referencia arXiv {arxiv_id} encontrada en la base de datos.")
+                    # Escribir el paper_id y el arxiv_id en el archivo
+                    file.write(f"Paper ID: {documento}, Referencia arXiv: {arxiv_id}\n")
+                else:
+                    print(f"Referencia arXiv {arxiv_id} no encontrada en la base de datos.")
+    return referencias_encontradas
+
+
+
+def extraer_arxiv_id(referencia):
+    # Extrae el identificador de arXiv de la referencia usando una expresión regular
+    import re
+    pattern = r'arxiv:\s*(\d+\.\d+|[a-z\-]+/\d+v\d+)'  # Patrón para arXiv ID
+    match = re.search(pattern, referencia.lower())
+    if match:
+        return match.group(1)
+    return None
+
+
+def obtener_primeros_paper_ids(client, index_name, num_documentos):
+    consulta = {
+        "query": {
+            "match_all": {}
+        },
+        "size": num_documentos,
+        "_source": ["paper_id"]  # Solo devolver el campo paper_id
+    }
+    
+    resultados = client.search(index=index_name, body=consulta)
+    documentos = resultados["hits"]["hits"]
+    
+    paper_ids = [doc["_source"]["paper_id"] for doc in documentos]
+    
+    return paper_ids
+
+def obtener_ultimos_paper_ids(client, index_name, num_documentos):
+    consulta = {
+        "query": {
+            "match_all": {}
+        },
+        "size": num_documentos,
+        "sort": [
+            {"_id": {"order": "desc"}}  # Ordenar por el campo _id en orden descendente
+        ],
+        "_source": ["paper_id"]  # Solo devolver el campo paper_id
+    }
+    
+    resultados = client.search(index=index_name, body=consulta)
+    documentos = resultados["hits"]["hits"]
+    
+    paper_ids = [doc["_source"]["paper_id"] for doc in documentos]
+    
+    return paper_ids
+
+
+
+
+def main_arxiv():
+    client = conexion()
+    primeros_paper_ids = obtener_ultimos_paper_ids(client, "indice_1", num_documentos=2000)
+    print(primeros_paper_ids)
+    for documento in primeros_paper_ids:
+        paper, referencias_arxiv = buscar_referencias_arxiv(client, "indice_1", documento)
+        referencias_encontradas = verificar_referencias_arxiv_en_base_de_datos(client, "indice_1", referencias_arxiv, "referencias_encontradas.txt", paper)
 
 ###################################################
 
@@ -498,10 +604,10 @@ def obtener_body_documento_y_comparar_string_presente(client, index_name, paper_
 #     #insertar_carpeta("/home/paula/Documentos/CUARTO_INF/SEGUNDO_CUATRI/tfg/unarXive_230324_open_subset/17/", client, index_name)
 #     #imprimir_numdoc_indice(index_name, client)
 
-def main_buscar():
-    client = conexion()
-    index_name = "indice_1"
-    obtener_body_documento_y_comparar_string_presente(client, index_name, "2201.01489", "The quark model calculations in the S01 partial wave, nonrelativistic or relativistic")
+# def main_buscar():
+#     client = conexion()
+#     index_name = "indice_1"
+#     obtener_body_documento_y_comparar_string_presente(client, index_name, "2201.01489", "The quark model calculations in the S01 partial wave, nonrelativistic or relativistic")
     #verificar_insercion_titulo(client, index_name, "Law of Iterated Logarithms and Fractal Properties of the KPZ Equation")
     #verificar_insercion_autor(client, index_name, "Sayan Das")
     # autor_buscado = "Sayan Das"
@@ -536,7 +642,7 @@ def main_buscar():
 
 ############################################################
 
-main_buscar()
+main_arxiv()
 
 
 

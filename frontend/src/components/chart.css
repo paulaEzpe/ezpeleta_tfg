@@ -1,7 +1,10 @@
 
 
+.chart-wrapper {
+  z-index: 0; /* Ajusta el z-index del wrapper del gráfico */
+}
+  
   .chart-container {
-    margin-top: 60px;
     height: 300px;
   }
   

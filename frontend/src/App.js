@@ -16,7 +16,7 @@ import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import ListGroup from 'react-bootstrap/ListGroup'
 import DoughnutChartSuscritos from "./components/DoughnutChartSuscritos";
-
+import Spinner from 'react-bootstrap/Spinner';
 
 
 function App() {
@@ -35,6 +35,8 @@ function App() {
   const [similitud, setSimilitud] = useState(null);
   const modelNames = ['Fasttext model', 'Google model', 'Our model', 'BERT', 'sentence-transformers BERT model'];
   const [isAnalizarCitaEnabled, setIsAnalizarCitaEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     // Desactivar el botón al principio
@@ -43,11 +45,13 @@ function App() {
 
   
   const handleShowModalModelo = () => {
+    //borrar cita, parrafo del texto seleccionado y referencas???
     setShowModalModelo(true);
     sendReferencedJsonToBackend();
   };
-  const handleCloseModalModelo = () => setShowModalModelo(false);
   const handleShowModalPolaridad = () => setShowModalPolaridad(true);
+
+  const handleCloseModalModelo = () => setShowModalModelo(false);
   const handleCloseModalPolaridad = () => setShowModalPolaridad(false);
 
   const sendReferencedJsonToBackend = async () => {
@@ -114,30 +118,39 @@ function App() {
 
 
   async function sendSelectedTextToBackend() {
-    
-      try {
-          console.log('He entrado');
-          // prueba
-          setBibliographyText('');
-          setTextInput('');
-          setParagraphText('');
-          setFilteredCitations([]);
-          setReferenceJsonText('');
-          const response = await fetch('/uploadSelectedText', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({ selectedText })
-          });
-          if (response.ok) {
-              console.log('Texto seleccionado enviado al backend exitosamente.');
-          } else {
-              console.error('Error al enviar el texto seleccionado al backend.');
-          }
-          await fetchBibliographyFromBackend();
-          await fetchParagraphFromBackend();
-      } catch (error) {
-          console.error('Error al enviar el texto seleccionado al backend:', error);
-      }
+    // Comprobar si el texto seleccionado no es una cadena vacía
+    if (!selectedText.trim()) {
+        toast.warn('No hay texto seleccionado');
+        console.warn('El texto seleccionado está vacío, no se enviará al backend.');
+        return;
+    }
+
+    try {
+        console.log('He entrado');
+        // prueba
+        setBibliographyText('');
+        setTextInput('');
+        setParagraphText('');
+        setFilteredCitations([]);
+        setReferenceJsonText('');
+        
+        const response = await fetch('/uploadSelectedText', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ selectedText })
+        });
+
+        if (response.ok) {
+            console.log('Texto seleccionado enviado al backend exitosamente.');
+        } else {
+            console.error('Error al enviar el texto seleccionado al backend.');
+        }
+
+        await fetchBibliographyFromBackend();
+        await fetchParagraphFromBackend();
+    } catch (error) {
+        console.error('Error al enviar el texto seleccionado al backend:', error);
+    }
   }
 
   //  para recibir del backend la bibliografía correspondiente al parrafo al que pertenece el texto seleccionado por el usuario
@@ -324,12 +337,16 @@ function App() {
   };
 
   const handlePDFSubmit = async (e) => {
+    document.getElementById('analizar-cita-btn').disabled = true;
     // prueba
     setTextInput('');
     setSelectedText('');
     setBibliographyText('');
     setViewPDF(null)
     e.preventDefault();
+    setParagraphText('');
+    setFilteredCitations([]);
+    setReferenceJsonText('');
     if (pdfFile !== null) {
       try {
         const loadingTask = pdfjsLib.getDocument(pdfFile);
@@ -349,15 +366,24 @@ function App() {
         });
         console.log('Texto extraído del PDF:', pdfText);
         if (response.ok) {
-          const { pdfUrl } = await response.json();
+          const { pdfUrl, tituloEncontrado, error } = await response.json();
           if (pdfUrl) {
-            // Actualizar el estado con la URL del PDF descargado
             setDownloadedPDF(pdfUrl);
-            // Actualizar el estado viewPDF con el PDF descargado
-            setViewPDF(pdfUrl);
+            console.log('PDF descargado desde el backend:', pdfUrl);
+            // Activar el botón de "Analizar cita" solo si se encontró el título en la base de datos
+            if (tituloEncontrado) {
+              setIsAnalizarCitaEnabled(true);
+            }
+            else {
+              toast.error('El artículo no se encuentra en la base de datos. No podrá analizar citas ni referencias.');
+              console.log('Error al encontrar el título:', error);
+            }
+          } else {
+            // Si no se encuentra el documento, mostrar mensaje y mantener botón desactivado
+            
           }
         } else {
-          console.error('Error al enviar el PDF al backend:', response.statusText);
+          console.error('Error al enviar el Input Text al backend:', response.statusText);
         }
       } catch (error) {
         console.error('Error extracting text from PDF:', error);
@@ -365,10 +391,13 @@ function App() {
       }
     }
   };
-  
-
 
   const handleInputSubmit = async () => {
+    if (!textInput.trim()) {
+      toast.warn('No se ha introducido ningún identificador de paper');
+      console.warn('El texto seleccionado está vacío, no se enviará al backend.');
+      return;
+    }
     try {
       setIsAnalizarCitaEnabled(false);
       setBibliographyText('');
@@ -376,7 +405,7 @@ function App() {
       setParagraphText('');
       setFilteredCitations([]);
       setReferenceJsonText('');
-  
+      // icono de carga
       // Desactivar el botón de "Analizar cita" antes de enviar la solicitud
       document.getElementById('analizar-cita-btn').disabled = true;
   
@@ -395,7 +424,7 @@ function App() {
             setIsAnalizarCitaEnabled(true);
           }
           else {
-            toast.error('El título no se encuentra en la base de datos.');
+            toast.error('El artículo no se encuentra en la base de datos. No podrá analizar citas ni referencias.');
             console.log('Error al encontrar el título:', error);
           }
         } else {
@@ -508,7 +537,6 @@ function App() {
             Obtain similarity
           </Button>
           <Modal show={showModalModelo} onHide={handleCloseModalModelo} centered>
-            <div className="modal-dialog modal-xl"> {/* Agrega la clase modal-lg aquí */}
               <Modal.Header closeButton>
                 <Modal.Title>Similarity between cite and referenced paper</Modal.Title>
               </Modal.Header>
@@ -523,7 +551,6 @@ function App() {
                   Close
                 </Button>
               </Modal.Footer>
-            </div>
           </Modal>
           <Button type="button" className="btn btn-secondary btn-lg" disabled={!isTextPresent} onClick={handleShowModalPolaridad}>
             Obtain polarity

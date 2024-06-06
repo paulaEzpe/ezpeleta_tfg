@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
+import Alert from 'react-bootstrap/Alert';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'pdfjs-dist/web/pdf_viewer.css';
@@ -31,6 +34,12 @@ function App() {
   const [showModalPolaridad, setShowModalPolaridad] = useState(false);
   const [similitud, setSimilitud] = useState(null);
   const modelNames = ['Fasttext model', 'Google model', 'Our model', 'BERT', 'sentence-transformers BERT model'];
+  const [isAnalizarCitaEnabled, setIsAnalizarCitaEnabled] = useState(false);
+
+  useEffect(() => {
+    // Desactivar el botón al principio
+    setIsAnalizarCitaEnabled(false);
+}, []);
 
   
   const handleShowModalModelo = () => {
@@ -105,7 +114,9 @@ function App() {
 
 
   async function sendSelectedTextToBackend() {
+    
       try {
+          console.log('He entrado');
           // prueba
           setBibliographyText('');
           setTextInput('');
@@ -321,7 +332,6 @@ function App() {
     e.preventDefault();
     if (pdfFile !== null) {
       try {
-        setViewPDF(pdfFile);
         const loadingTask = pdfjsLib.getDocument(pdfFile);
         const pdf = await loadingTask.promise;
         let pdfText = '';
@@ -338,34 +348,60 @@ function App() {
           body: JSON.stringify({ pdfText })
         });
         console.log('Texto extraído del PDF:', pdfText);
+        if (response.ok) {
+          const { pdfUrl } = await response.json();
+          if (pdfUrl) {
+            // Actualizar el estado con la URL del PDF descargado
+            setDownloadedPDF(pdfUrl);
+            // Actualizar el estado viewPDF con el PDF descargado
+            setViewPDF(pdfUrl);
+          }
+        } else {
+          console.error('Error al enviar el PDF al backend:', response.statusText);
+        }
       } catch (error) {
         console.error('Error extracting text from PDF:', error);
         throw error;
       }
     }
   };
+  
 
 
   const handleInputSubmit = async () => {
     try {
-      //ultimo
-      // poner todas las variables de texto a 0
+      setIsAnalizarCitaEnabled(false);
       setBibliographyText('');
       setSelectedText('');
       setParagraphText('');
       setFilteredCitations([]);
       setReferenceJsonText('');
+  
+      // Desactivar el botón de "Analizar cita" antes de enviar la solicitud
+      document.getElementById('analizar-cita-btn').disabled = true;
+  
       const response = await fetch('/uploadInputPdfId', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inputText: textInput })
       });
       if (response.ok) {
-        // Obtener la URL del PDF descargado desde el backend
-        const { pdfUrl } = await response.json();
-        // Establecer el PDF descargado en el estado
-        setDownloadedPDF(pdfUrl);
-        console.log('PDF descargado desde el backend:', pdfUrl);
+        const { pdfUrl, tituloEncontrado, error } = await response.json();
+        if (pdfUrl) {
+          setDownloadedPDF(pdfUrl);
+          console.log('PDF descargado desde el backend:', pdfUrl);
+          // Activar el botón de "Analizar cita" solo si se encontró el título en la base de datos
+          if (tituloEncontrado) {
+            setIsAnalizarCitaEnabled(true);
+          }
+          else {
+            toast.error('El título no se encuentra en la base de datos.');
+            console.log('Error al encontrar el título:', error);
+          }
+        } else {
+          // Si no se encuentra el documento, mostrar mensaje y mantener botón desactivado
+          
+        }
       } else {
         console.error('Error al enviar el Input Text al backend:', response.statusText);
       }
@@ -375,6 +411,7 @@ function App() {
     }
   };
   
+  
 
   const handleDownloadedPDF = (downloadedPDFUrl) => {
     setDownloadedPDF(downloadedPDFUrl);
@@ -382,6 +419,7 @@ function App() {
 
   return (
     <div className="container-fluid h-100">
+      <ToastContainer />
       <div className="row h-100">
         <div className="col-3 px-1 bg-light position-fixed" id="sticky-sidebar" style={{ overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
                         msOverflowStyle: 'none' /* For Internet Explorer and Edge */ }}>
@@ -408,7 +446,8 @@ function App() {
                           height: '300px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}}  value={selectedText} readOnly 
                         />
-                        <button type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()}>Analizar cita</button>
+                        <button id="analizar-cita-btn" type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()} disabled={!isAnalizarCitaEnabled}>Analizar cita</button>
+
                       </div>
                       <div className="input-container3">
                         <h6>Párrafo del texto seleccionado</h6>

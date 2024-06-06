@@ -104,27 +104,24 @@ def upload_input_text():
     if input_text is None:
         return {"error": "No se proporcionó el texto del input"}, 400
     else:
-        # Descargar el PDF y obtener su ruta en el servidor
-        #paper_id=input_text
+        # Suponiendo que `modify_paper_id` es una función que modifica el estado de `session['paper_id']`
         modify_paper_id(input_text)
         print("Id del documento buscado y descargado:", session['paper_id'])
         pdf_path = PDFProcessor.descargar_pdf_arxiv(session['paper_id'], "../datos/")
         print("lo he descargadoi sin problemas")
+        titulo = None
         if pdf_path:
-            # Devolver la ruta del PDF al cliente
             print(pdf_path)
-            #client = conexion()
-            #verificar_conexion(client)
-            # titulo = obtener_titulo_por_paper_id(client, index_name, session['paper_id']) #buscarlo en opensearch por id del paper
             client = ElasticsearchClient()
             titulo = client.obtener_titulo_por_paper_id(index_name, session['paper_id'])
             if titulo is not None:
                 print("Título del documento encontrado:", titulo)
-            else:
-                print("No se encontró ningún documento con el paper_id dado.")
-            return {"pdfUrl": pdf_path}
         else:
+            print("No se pudo descargar el PDF remoto.")
             return {"error": "No se pudo descargar el PDF remoto"}, 500
+
+        # Devolver pdf_path y la bandera de título encontrado
+        return {"pdfUrl": pdf_path, "tituloEncontrado": titulo is not None}
 
 
 #-------------------------------------------------------------------------------------

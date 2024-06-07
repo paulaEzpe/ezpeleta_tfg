@@ -216,7 +216,12 @@ function App() {
 
   const handleClick = async (citationContent) => {
     console.log('Contenido de la cita:', citationContent);
-
+    // en caso ed que la cita seleccionada no contenga "arxiv:", no se envía al backend
+    if (!(citationContent.includes("arXiv:"))) {
+      toast.warn('La cita seleccionada no pertenece a arXiv. Seleccione una que sí.');
+      console.warn('La cita seleccionada no pertenece a arXive');
+      return;
+    }
     try {
         const response = await fetch('/sendCitationToBackend', {
             method: 'POST',

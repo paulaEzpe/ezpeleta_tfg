@@ -204,6 +204,8 @@ def receive_citation_from_frontend():
     # texto_del_cuerpo_documento_referencia = obtener_json_por_paper_id_u_obtener_texto(client, index_name, paper_id_referencia)
     client = ElasticsearchClient()
     texto_del_cuerpo_documento_referencia = client.obtener_json_por_paper_id_u_obtener_texto(index_name, paper_id_referencia)
+    with open("fichero_obtendo_json_frontend_1.txt", 'w') as file:
+            file.write(texto_del_cuerpo_documento_referencia)
     #devolver el texto del json al frontend
     # en caso de que me devuelva que no está en la bd, buscar en archive el paper y devolverlo en forma de texto
     # return texto_del_cuerpo_documento_referencia

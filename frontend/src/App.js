@@ -101,52 +101,6 @@ function App() {
 
   
 
-  // const sendReferencedJsonBodyToBackend = async () => {
-  //   try {
-  //       // Encontrar el índice donde comienza el cuerpo del texto
-  //       const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
-
-  //       // Si "texto cuerpo:" se encuentra en referenceJsonText, extraerlo
-  //       let cuerpoDelTexto = referenceJsonText;
-  //       if (cuerpoDelTextoIndex !== -1) {
-  //           // Extraer el texto que sigue después de "texto cuerpo:"
-  //           cuerpoDelTexto = referenceJsonText.substring(cuerpoDelTextoIndex + "Texto del Cuerpo:".length).trim();
-  //           console.log('Cuerpo del texto:', cuerpoDelTexto);
-  //       } else {
-  //           console.error('No se encontró "texto cuerpo:" en el texto de la referencia.');
-  //           return;
-  //       }
-
-  //       // Enviar solo el cuerpo del texto al backend
-  //       const response = await fetch('/sendReferencedJsonBodyToBackend', {
-  //           method: 'POST',
-  //           headers: {
-  //               'Content-Type': 'application/json'
-  //           },
-  //           body: JSON.stringify({ referencedjsonbodytextandselectedtext: cuerpoDelTexto, selectedText })
-  //       });
-
-  //       if (response.ok) {
-  //           const responseData = await response.json();
-  //           console.log('Respuesta del backend:', responseData);
-
-  //           if (responseData.similitudes && responseData.similitudes > 0 && responseData.paragraph) {
-  //               // Actualizar el estado con las similitudes recibidas y el párrafo correspondiente
-  //               setSimilitud(responseData.similitudes);
-  //               setParagraph(responseData.paragraph);
-  //               console.log('Similitudes recibidas:', responseData.similitudes);
-  //               console.log('Párrafo con las similitudes más altas:', responseData.paragraph);
-  //           } else {
-  //               console.error('El backend no devolvió las similitudes esperadas.');
-  //           }
-  //       } else {
-  //           console.error('Error al enviar el texto al backend.');
-  //       }
-  //   } catch (error) {
-  //       console.error('Error al enviar el texto al backend:', error);
-  //   }
-  // };
-
   const sendReferencedJsonBodyToBackend = async () => {
     try {
         // Encontrar el índice donde comienza el cuerpo del texto
@@ -177,19 +131,65 @@ function App() {
             console.log('Respuesta del backend:', responseData);
 
             if (responseData.similitudes && responseData.similitudes.length > 0) {
-                // Actualizar el estado con las similitudes recibidas
+                // Actualizar el estado con las similitudes recibidas y el párrafo correspondiente
                 setSimilitud(responseData.similitudes);
+                setParagraph(responseData.paragraph);
                 console.log('Similitudes recibidas:', responseData.similitudes);
+                console.log('Párrafo con las similitudes más altas:', responseData.paragraph);
             } else {
                 console.error('El backend no devolvió las similitudes esperadas.');
             }
         } else {
-            console.error('Error al enviar la cita al backend.');
+            console.error('Error al enviar el texto al backend.');
         }
     } catch (error) {
-        console.error('Error al enviar la cita al backend:', error);
+        console.error('Error al enviar el texto al backend:', error);
     }
   };
+
+  // const sendReferencedJsonBodyToBackend = async () => {
+  //   try {
+  //       // Encontrar el índice donde comienza el cuerpo del texto
+  //       const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
+
+  //       // Si "texto cuerpo:" se encuentra en referenceJsonText, extraerlo
+  //       let cuerpoDelTexto = referenceJsonText;
+  //       if (cuerpoDelTextoIndex !== -1) {
+  //           // Extraer el texto que sigue después de "texto cuerpo:"
+  //           cuerpoDelTexto = referenceJsonText.substring(cuerpoDelTextoIndex + "Texto del Cuerpo:".length).trim();
+  //           console.log('Cuerpo del texto:', cuerpoDelTexto);
+  //       } else {
+  //           console.error('No se encontró "texto cuerpo:" en el texto de la referencia.');
+  //           return;
+  //       }
+
+  //       // Enviar solo el cuerpo del texto al backend
+  //       const response = await fetch('/sendReferencedJsonBodyToBackend', {
+  //           method: 'POST',
+  //           headers: {
+  //               'Content-Type': 'application/json'
+  //           },
+  //           body: JSON.stringify({ referencedjsonbodytextandselectedtext: cuerpoDelTexto, selectedText })
+  //       });
+
+  //       if (response.ok) {
+  //           const responseData = await response.json();
+  //           console.log('Respuesta del backend:', responseData);
+
+  //           if (responseData.similitudes && responseData.similitudes.length > 0) {
+  //               // Actualizar el estado con las similitudes recibidas
+  //               setSimilitud(responseData.similitudes);
+  //               console.log('Similitudes recibidas:', responseData.similitudes);
+  //           } else {
+  //               console.error('El backend no devolvió las similitudes esperadas.');
+  //           }
+  //       } else {
+  //           console.error('Error al enviar la cita al backend.');
+  //       }
+  //   } catch (error) {
+  //       console.error('Error al enviar la cita al backend:', error);
+  //   }
+  // };
 
   const sendReferencedJsonAbstractToBackend = async () => {
     try {
@@ -709,7 +709,8 @@ function App() {
                 <Modal.Title>Similarity between cite and referenced paper body</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-              <DoughnutChartSuscritos similitudes={similitud} colors={customColorsBody} />
+                {paragraph}
+                <DoughnutChartSuscritos similitudes={similitud} colors={customColorsBody} />
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleCloseModalModeloCuerpo}>

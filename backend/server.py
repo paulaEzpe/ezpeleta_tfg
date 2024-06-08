@@ -9,6 +9,7 @@ import json
 import requests
 from io import BytesIO 
 import PyPDF2
+import numpy as np
 
 # Importar las clases de los otros módulos
 from pdf_processor import PDFProcessor
@@ -220,80 +221,95 @@ def receive_citation_from_frontend():
 #------------------------------------------------------------------------------------
 
 # para mandar al backend el texto del json que se ha referenciado para poder usar el modelo
-# @app.route('/sendReferencedJsonBodyToBackend', methods=['POST'])
-# def receive_referenced_json():
-#     data = request.get_json()
-#     referencedjsontext = data.get('referencedjsonbodytextandselectedtext')
-#     selectedText = data.get('selectedText')
-
-#     if referencedjsontext and selectedText:
-#         print('Texto JSON recibido desde el frontend:', referencedjsontext)
-#         print('Texto seleccionado recibido desde el frontend:', selectedText)
-
-#         # Dividir el texto completo en párrafos
-#         paragraphs = referencedjsontext.split('\n\n')
-
-#         # Inicializar variables para almacenar el párrafo con las similitudes más altas
-#         max_similarity_paragraph = ""
-#         max_avg_similarity = 0
-#         similitudes = []
-
-#         for paragraph in paragraphs:
-#             paragraph_str = str(paragraph)
-#             textP = TextProcessor()
-#             text_words, cite_words = textP.obtain_list_english_words(paragraph_str, selectedText)
-#             similitudes_parrafo = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words)
-            
-#             if similitudes:  # Verificar si hay similitudes válidas
-#                 avg_similarity = sum(similitudes_parrafo) / len(similitudes_parrafo)
-#             else:
-#                 avg_similarity = 0  # O cualquier otro valor predeterminado que desees
-
-#             print(f'Promedio de similitudes para el párrafo: {avg_similarity}, párrafo: {paragraph_str}')
-
-#             if avg_similarity > max_avg_similarity:
-#                 max_avg_similarity = avg_similarity
-#                 max_similarity_paragraph = paragraph_str
-#                 similitudes = similitudes_parrafo  # ¿Necesario asignar esto nuevamente?
-
-#         # Devolver las similitudes y el párrafo con las similitudes más altas
-#         if max_similarity_paragraph:
-#             return jsonify({'message': 'Similitudes calculadas con éxito', 'similitudes': similitudes, 'paragraph': max_similarity_paragraph}), 200
-#         else:
-#             print('No se pudo calcular la similitud entre la cita y el artículo.')
-#             return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500
-
 @app.route('/sendReferencedJsonBodyToBackend', methods=['POST'])
 def receive_referenced_json():
     data = request.get_json()
     referencedjsontext = data.get('referencedjsonbodytextandselectedtext')
-    #aqui habria que cogerlo de la variable de sesion en vez de aqui
     selectedText = data.get('selectedText')
 
     if referencedjsontext and selectedText:
         print('Texto JSON recibido desde el frontend:', referencedjsontext)
         print('Texto seleccionado recibido desde el frontend:', selectedText)
-        # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con los modelos y
-        # devolver los resultados del modelo
-        print("Tipo de referencedjsontext:", type(referencedjsontext))
-        print("Tipo de selectedText:", type(selectedText))
-        referencedjsontext_str = str(referencedjsontext)
-        selectedText_str = str(selectedText)
-        textP = TextProcessor()
-        text_words, cite_words = textP.obtain_list_english_words(referencedjsontext_str, selectedText_str)
-        print("Las palabras de la cita son las siguientes: ", cite_words)
-        # Obtener similitudes usando todos los modelos
-        similitudes = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words)
-        # Imprimir las similitudes por terminal
-        for i, similitud in enumerate(similitudes):
-            print(f'Similitud entre la cita y el artículo (modelo {i+1}): {similitud}')
-        # Si alguna similitud está definida, devolver el resultado exitosamente
-        similitudes = [float(similitud) for similitud in similitudes]
-        if any(similitudes):
-            return jsonify({'message': 'Textos recibidos con éxito', 'similitudes': similitudes}), 200
+
+        # Dividir el texto completo en párrafos
+        paragraphs = referencedjsontext.split('\n\n')
+
+        # Inicializar variables para almacenar el párrafo con las similitudes más altas
+        max_similarity_paragraph = ""
+        max_avg_similarity = 0
+        similitudes = []
+        similitudes_calculadas = []
+
+        for paragraph in paragraphs:
+            paragraph_str = str(paragraph)
+            textP = TextProcessor()
+            text_words, cite_words = textP.obtain_list_english_words(paragraph_str, selectedText)
+            similitudes_parrafo = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words)
+            print("Similitudes_parrafo:", similitudes_parrafo)
+            
+            if similitudes_parrafo:
+                elementos = []
+
+                for value in similitudes_parrafo:
+                    if isinstance(value, np.ndarray):
+                        # Si el elemento es un array, calcular el promedio de sus elementos
+                        elementos.append(0)
+                    else:
+                        # Si el elemento no es un array, agregarlo directamente al total
+                        elementos.append(value)
+
+                print("elementos:", elementos)
+                avg_similarity = np.mean(elementos)
+
+            if avg_similarity > max_avg_similarity:
+                max_avg_similarity = avg_similarity
+                max_similarity_paragraph = paragraph_str
+                similitudes = elementos
+
+        # Devolver las similitudes y el párrafo con las similitudes más altas
+        if max_similarity_paragraph:
+            print("Similitudes:", similitudes)
+            print("el tipo de datos de similitudes es:", type(similitudes))
+            print("max similarity paragraph:", max_similarity_paragraph)
+            similitudes = [value.tolist() if isinstance(value, np.ndarray) else float(value) for value in similitudes]
+            return jsonify({'message': 'Similitudes calculadas con éxito', 'similitudes': similitudes, 'paragraph': max_similarity_paragraph}), 200
+            
         else:
             print('No se pudo calcular la similitud entre la cita y el artículo.')
             return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500
+
+
+# @app.route('/sendReferencedJsonBodyToBackend', methods=['POST'])
+# def receive_referenced_json():
+#     data = request.get_json()
+#     referencedjsontext = data.get('referencedjsonbodytextandselectedtext')
+#     #aqui habria que cogerlo de la variable de sesion en vez de aqui
+#     selectedText = data.get('selectedText')
+
+#     if referencedjsontext and selectedText:
+#         print('Texto JSON recibido desde el frontend:', referencedjsontext)
+#         print('Texto seleccionado recibido desde el frontend:', selectedText)
+#         # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con los modelos y
+#         # devolver los resultados del modelo
+#         print("Tipo de referencedjsontext:", type(referencedjsontext))
+#         print("Tipo de selectedText:", type(selectedText))
+#         referencedjsontext_str = str(referencedjsontext)
+#         selectedText_str = str(selectedText)
+#         textP = TextProcessor()
+#         text_words, cite_words = textP.obtain_list_english_words(referencedjsontext_str, selectedText_str)
+#         print("Las palabras de la cita son las siguientes: ", cite_words)
+#         # Obtener similitudes usando todos los modelos
+#         similitudes = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words)
+#         # Imprimir las similitudes por terminal
+#         for i, similitud in enumerate(similitudes):
+#             print(f'Similitud entre la cita y el artículo (modelo {i+1}): {similitud}')
+#         # Si alguna similitud está definida, devolver el resultado exitosamente
+#         similitudes = [float(similitud) for similitud in similitudes]
+#         if any(similitudes):
+#             return jsonify({'message': 'Textos recibidos con éxito', 'similitudes': similitudes}), 200
+#         else:
+#             print('No se pudo calcular la similitud entre la cita y el artículo.')
+#             return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500
 
 
 

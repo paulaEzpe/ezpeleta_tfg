@@ -47,22 +47,40 @@ function App() {
   const handleShowModalModelo = () => {
     //borrar cita, parrafo del texto seleccionado y referencas???
     setShowModalModelo(true);
-    sendReferencedJsonToBackend();
+    sendReferencedJsonBodyToBackend();
   };
   const handleShowModalPolaridad = () => setShowModalPolaridad(true);
 
   const handleCloseModalModelo = () => setShowModalModelo(false);
   const handleCloseModalPolaridad = () => setShowModalPolaridad(false);
 
-  const sendReferencedJsonToBackend = async () => {
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const sendReferencedJsonBodyToBackend = async () => {
     try {
-        const response = await fetch('/sendReferencedJsonToBackend', {
+        // Encontrar el índice donde comienza el cuerpo del texto
+        const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
+
+        // Si "texto cuerpo:" se encuentra en referenceJsonText, extraerlo
+        let cuerpoDelTexto = referenceJsonText;
+        if (cuerpoDelTextoIndex !== -1) {
+            // Extraer el texto que sigue después de "texto cuerpo:"
+            cuerpoDelTexto = referenceJsonText.substring(cuerpoDelTextoIndex + "Texto del Cuerpo:".length).trim();
+            console.log('Cuerpo del texto:', cuerpoDelTexto);
+        } else {
+            console.error('No se encontró "texto cuerpo:" en el texto de la referencia.');
+            return;
+        }
+
+        // Enviar solo el cuerpo del texto al backend
+        const response = await fetch('/sendReferencedJsonBodyToBackend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ referencedjsontextandselectedtext: referenceJsonText, selectedText })
+            body: JSON.stringify({ referencedjsonbodytextandselectedtext: cuerpoDelTexto, selectedText })
         });
+
         if (response.ok) {
             const responseData = await response.json();
             console.log('Respuesta del backend:', responseData);
@@ -82,6 +100,7 @@ function App() {
     }
   };
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
   
@@ -216,12 +235,14 @@ function App() {
 
   const handleClick = async (citationContent) => {
     console.log('Contenido de la cita:', citationContent);
-    // en caso ed que la cita seleccionada no contenga "arxiv:", no se envía al backend
-    if (!(citationContent.includes("arXiv:"))) {
-      toast.warn('La cita seleccionada no pertenece a arXiv. Seleccione una que sí.');
-      console.warn('La cita seleccionada no pertenece a arXive');
-      return;
+
+    // En caso de que la cita seleccionada no contenga "arxiv:", no se envía al backend
+    if (!citationContent.includes("arXiv:")) {
+        toast.warn('La cita seleccionada no pertenece a arXiv. Seleccione una que sí.');
+        console.warn('La cita seleccionada no pertenece a arXiv.');
+        return;
     }
+
     try {
         const response = await fetch('/sendCitationToBackend', {
             method: 'POST',
@@ -230,19 +251,23 @@ function App() {
             },
             body: JSON.stringify({ citation: citationContent })
         });
-        if (response.ok) {
-            const referenceJsonText = await response.text();
-            console.log('Cuerpo del JSON recibido en el frontend:', referenceJsonText);
 
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Cuerpo del JSON recibido en el frontend:', responseData);
+
+            // Formatear el texto recibido para mostrar en el textarea
+            const formattedText = `Abstract: ${responseData.abstract}\n\nTexto del Cuerpo:\n${responseData.texto_del_cuerpo}`;
+            
             // Guardar el texto recibido en la variable de estado
-            setReferenceJsonText([referenceJsonText]);
+            setReferenceJsonText(formattedText);
         } else {
             console.error('Error al enviar la cita al backend.');
         }
     } catch (error) {
         console.error('Error al enviar la cita al backend:', error);
     }
-  }
+  };
 
   const isTextPresent = referenceJsonText.length > 0;
 
@@ -546,9 +571,7 @@ function App() {
                 <Modal.Title>Similarity between cite and referenced paper</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                {similitud && similitud.map((sim, index) => (
-                  <h6 key={index}>Similitud {modelNames[index]}: {sim}</h6>
-                ))}
+                <DoughnutChartSuscritos similitudes={similitud} className="chart-container" />
                 <DoughnutChartSuscritos similitudes={similitud} className="chart-container" />
               </Modal.Body>
               <Modal.Footer>

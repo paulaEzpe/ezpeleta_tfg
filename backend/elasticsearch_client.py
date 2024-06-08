@@ -85,6 +85,9 @@ class ElasticsearchClient:
             # Acceder al campo body_text del documento original
             body_text = documento_original["body_text"]
 
+            abstract_obj = documento_original.get("abstract", {})
+            abstract_texto = abstract_obj.get("text", "") + "\n"
+
             texto_cuerpo_json = ""
 
             for obj in body_text:
@@ -92,13 +95,18 @@ class ElasticsearchClient:
                 texto = obj["text"]
                 texto_parrafo_limpio = self.text_processor.limpiar_texto(texto)
                 texto_parrafo = ' '.join(texto_parrafo_limpio)
-                texto_cuerpo_json += texto_parrafo + "\n"
-            return texto_cuerpo_json
+                texto_cuerpo_json += texto_parrafo + "\n" + "\n"
+
+            texto_cuerpo_json = texto_cuerpo_json + "\n"
+
+            return texto_cuerpo_json, abstract_texto
         else:
             print("como no se ha encontrado el documento en la base de datos, lo descargo y extraigo el texto")
             # Si el paper_id no se encuentra en la base de datos, descargar y extraer el PDF
             texto_pdf, _ = PDFProcessor.descargar_y_extraer_texto_pdf_arxiv(paper_id_referencia, "../datos/")
-            return texto_pdf
+            #aqui habria que meter lo de la expresion regular para obtener la referencia
+            abstract_descargado = "abstract no obtenido aun" + "\n"
+            return texto_pdf, abstract_descargado
 
     # Implementado con mi algoritmo
     def obtener_bibliografia_texto_parrafo_seleccion(self, index_name, paper_id, cita):

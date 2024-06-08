@@ -188,37 +188,42 @@ def get_received_paragraph_text():
 
 #------------------------------------------------------------------------------------
 
-@app.route('/sendCitationToBackend', methods=['POST', 'GET'])
+@app.route('/sendCitationToBackend', methods=['POST'])
 def receive_citation_from_frontend():
     # Obtener la cita del cuerpo de la solicitud JSON
     citation = request.json.get('citation')
 
     # Aquí puedes hacer lo que necesites con la cita recibida
     print('Cita recibida en el backend:', citation)
-    # extraer el paper_id del entry_raw 
-    # client = conexion()
-    # extraemos el paper_id del arxiv de la referencia
+
+    # Extraer el paper_id del entry_raw 
     paper_id_referencia = PDFProcessor.extraer_arxiv_de_entry_raw(citation)
     print("paper id de la referencia:", paper_id_referencia)
-    # obtenemos el cuerpo del json correspondiente al paper_id de la referencia
-    # texto_del_cuerpo_documento_referencia = obtener_json_por_paper_id_u_obtener_texto(client, index_name, paper_id_referencia)
+
+    # Obtener el cuerpo del json correspondiente al paper_id de la referencia
     client = ElasticsearchClient()
-    texto_del_cuerpo_documento_referencia = client.obtener_json_por_paper_id_u_obtener_texto(index_name, paper_id_referencia)
+    texto_del_cuerpo_documento_referencia, abstract_documento_referencia = client.obtener_json_por_paper_id_u_obtener_texto(index_name, paper_id_referencia)
+
+    # Escribir en un fichero para debug (opcional)
     with open("fichero_obtendo_json_frontend_1.txt", 'w') as file:
-            file.write(texto_del_cuerpo_documento_referencia)
-    #devolver el texto del json al frontend
-    # en caso de que me devuelva que no está en la bd, buscar en archive el paper y devolverlo en forma de texto
-    # return texto_del_cuerpo_documento_referencia
-    #print('Cuerpo del json mandado al frontend:', texto_del_cuerpo_documento_referencia)
-    return texto_del_cuerpo_documento_referencia
+        file.write(texto_del_cuerpo_documento_referencia)
+
+    # Devolver el texto del json al frontend
+    response_data = {
+        "texto_del_cuerpo": texto_del_cuerpo_documento_referencia,
+        "abstract": abstract_documento_referencia
+    }
+
+    return jsonify(response_data)
+
 
 #------------------------------------------------------------------------------------
 
 # para mandar al backend el texto del json que se ha referenciado para poder usar el modelo
-@app.route('/sendReferencedJsonToBackend', methods=['POST'])
+@app.route('/sendReferencedJsonBodyToBackend', methods=['POST'])
 def receive_referenced_json():
     data = request.get_json()
-    referencedjsontext = data.get('referencedjsontextandselectedtext')
+    referencedjsontext = data.get('referencedjsonbodytextandselectedtext')
     #aqui habria que cogerlo de la variable de sesion en vez de aqui
     selectedText = data.get('selectedText')
 

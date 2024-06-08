@@ -30,31 +30,122 @@ function App() {
   const [paragraphText, setParagraphText] = useState('');
   const [filteredCitations, setFilteredCitations] = useState([]);
   const [referenceJsonText, setReferenceJsonText] = useState('');
-  const [showModalModelo, setShowModalModelo] = useState(false);
+  const [showModalModeloCuerpo, setShowModalModeloCuerpo] = useState(false);
+  const [showModalModeloAbstract, setShowModalModeloAbstract] = useState(false);
   const [showModalPolaridad, setShowModalPolaridad] = useState(false);
   const [similitud, setSimilitud] = useState(null);
   const modelNames = ['Fasttext model', 'Google model', 'Our model', 'BERT', 'sentence-transformers BERT model'];
   const [isAnalizarCitaEnabled, setIsAnalizarCitaEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [similitudAbstract, setSimilitudAbstract] = useState(null);
+  const [paragraph, setParagraph] = useState("");
+
+  const customColorsAbstract = {
+    backgroundColors: [
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(255, 206, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(153, 102, 255, 0.2)'
+    ],
+    borderColors: [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 206, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(153, 102, 255)'
+    ]
+  };
+
+  const customColorsBody = {
+    backgroundColors: [
+      'rgba(68, 108, 179, 0.2)', // Azul oscuro
+      'rgba(146, 43, 33, 0.2)', // Rojo oscuro
+      'rgba(41, 89, 69, 0.2)', // Verde oscuro
+      'rgba(91, 42, 116, 0.2)', // Púrpura oscuro
+      'rgba(119, 91, 91, 0.2)' // Marrón oscuro
+    ],
+    borderColors: [
+      'rgb(68, 108, 179)', // Azul oscuro
+      'rgb(146, 43, 33)', // Rojo oscuro
+      'rgb(41, 89, 69)', // Verde oscuro
+      'rgb(91, 42, 116)', // Púrpura oscuro
+      'rgb(119, 91, 91)' // Marrón oscuro
+    ]
+  };
+
 
 
   useEffect(() => {
     // Desactivar el botón al principio
     setIsAnalizarCitaEnabled(false);
-}, []);
+  }, []);
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////
   
-  const handleShowModalModelo = () => {
+  const handleShowModalModeloCuerpo = () => {
     //borrar cita, parrafo del texto seleccionado y referencas???
-    setShowModalModelo(true);
+    setShowModalModeloCuerpo(true);
     sendReferencedJsonBodyToBackend();
+  };
+  const handleShowModalModeloAbstract = () => {
+    //borrar cita, parrafo del texto seleccionado y referencas???
+    setShowModalModeloAbstract(true);
+    sendReferencedJsonAbstractToBackend();
   };
   const handleShowModalPolaridad = () => setShowModalPolaridad(true);
 
-  const handleCloseModalModelo = () => setShowModalModelo(false);
+  const handleCloseModalModeloCuerpo = () => setShowModalModeloCuerpo(false);
+  const handleCloseModalModeloAbstract = () => setShowModalModeloAbstract(false);
   const handleCloseModalPolaridad = () => setShowModalPolaridad(false);
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////
+  
+
+  // const sendReferencedJsonBodyToBackend = async () => {
+  //   try {
+  //       // Encontrar el índice donde comienza el cuerpo del texto
+  //       const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
+
+  //       // Si "texto cuerpo:" se encuentra en referenceJsonText, extraerlo
+  //       let cuerpoDelTexto = referenceJsonText;
+  //       if (cuerpoDelTextoIndex !== -1) {
+  //           // Extraer el texto que sigue después de "texto cuerpo:"
+  //           cuerpoDelTexto = referenceJsonText.substring(cuerpoDelTextoIndex + "Texto del Cuerpo:".length).trim();
+  //           console.log('Cuerpo del texto:', cuerpoDelTexto);
+  //       } else {
+  //           console.error('No se encontró "texto cuerpo:" en el texto de la referencia.');
+  //           return;
+  //       }
+
+  //       // Enviar solo el cuerpo del texto al backend
+  //       const response = await fetch('/sendReferencedJsonBodyToBackend', {
+  //           method: 'POST',
+  //           headers: {
+  //               'Content-Type': 'application/json'
+  //           },
+  //           body: JSON.stringify({ referencedjsonbodytextandselectedtext: cuerpoDelTexto, selectedText })
+  //       });
+
+  //       if (response.ok) {
+  //           const responseData = await response.json();
+  //           console.log('Respuesta del backend:', responseData);
+
+  //           if (responseData.similitudes && responseData.similitudes > 0 && responseData.paragraph) {
+  //               // Actualizar el estado con las similitudes recibidas y el párrafo correspondiente
+  //               setSimilitud(responseData.similitudes);
+  //               setParagraph(responseData.paragraph);
+  //               console.log('Similitudes recibidas:', responseData.similitudes);
+  //               console.log('Párrafo con las similitudes más altas:', responseData.paragraph);
+  //           } else {
+  //               console.error('El backend no devolvió las similitudes esperadas.');
+  //           }
+  //       } else {
+  //           console.error('Error al enviar el texto al backend.');
+  //       }
+  //   } catch (error) {
+  //       console.error('Error al enviar el texto al backend:', error);
+  //   }
+  // };
 
   const sendReferencedJsonBodyToBackend = async () => {
     try {
@@ -99,6 +190,53 @@ function App() {
         console.error('Error al enviar la cita al backend:', error);
     }
   };
+
+  const sendReferencedJsonAbstractToBackend = async () => {
+    try {
+        // Encontrar el índice donde comienza el abstract
+        const abstractIndex = referenceJsonText.indexOf("Abstract:");
+
+        // Encontrar el índice donde comienza el cuerpo del texto
+        const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
+
+        // Si "Abstract:" y "Texto del Cuerpo:" se encuentran en referenceJsonText, extraer el texto entre ellos
+        if (abstractIndex !== -1 && cuerpoDelTextoIndex !== -1) {
+            // Extraer el texto entre "Abstract:" y "Texto del Cuerpo:" (excluyendo ambas etiquetas)
+            const textoEntreAbstractYCuerpo = referenceJsonText.substring(abstractIndex + "Abstract:".length, cuerpoDelTextoIndex).trim();
+            console.log('Texto entre Abstract y Texto del Cuerpo:', textoEntreAbstractYCuerpo);
+
+            // Enviar solo el texto entre Abstract y Texto del Cuerpo al backend
+            const response = await fetch('/sendReferencedJsonAbstractToBackend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ referencedjsonabstracttextandselectedtext: textoEntreAbstractYCuerpo, selectedText })
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log('Respuesta del backend:', responseData);
+
+                if (responseData.similitudes && responseData.similitudes.length > 0) {
+                    // Actualizar el estado con las similitudes recibidas
+                    setSimilitudAbstract(responseData.similitudes);
+                    console.log('Similitudes recibidas:', responseData.similitudes);
+                } else {
+                    console.error('El backend no devolvió las similitudes esperadas.');
+                }
+            } else {
+                console.error('Error al enviar la cita al backend.');
+            }
+        } else {
+            console.error('No se encontró "Abstract:" o "Texto del Cuerpo:" en el texto de la referencia.');
+            return;
+        }
+    } catch (error) {
+        console.error('Error al enviar la cita al backend:', error);
+    }
+  };
+
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -563,24 +701,39 @@ function App() {
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}} value={referenceJsonText}
                         onChange={handleTextInputChange} readOnly 
                       />
-          <Button type="button" className="btn btn-lg btn-primary" disabled={!isTextPresent} onClick={handleShowModalModelo}>
-            Obtain similarity
+          <Button variant="outline-success" disabled={!isTextPresent} onClick={handleShowModalModeloCuerpo}>
+            Obtain similarity with body
           </Button>
-          <Modal show={showModalModelo} onHide={handleCloseModalModelo} centered>
+          <Modal show={showModalModeloCuerpo} onHide={handleCloseModalModeloCuerpo} centered>
               <Modal.Header closeButton>
-                <Modal.Title>Similarity between cite and referenced paper</Modal.Title>
+                <Modal.Title>Similarity between cite and referenced paper body</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <DoughnutChartSuscritos similitudes={similitud} className="chart-container" />
-                <DoughnutChartSuscritos similitudes={similitud} className="chart-container" />
+              <DoughnutChartSuscritos similitudes={similitud} colors={customColorsBody} />
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModalModelo}>
+                <Button variant="secondary" onClick={handleCloseModalModeloCuerpo}>
                   Close
                 </Button>
               </Modal.Footer>
           </Modal>
-          <Button type="button" className="btn btn-secondary btn-lg" disabled={!isTextPresent} onClick={handleShowModalPolaridad}>
+          <Button variant="outline-dark" disabled={!isTextPresent} onClick={handleShowModalModeloAbstract}>
+            Obtain similarity with abstract
+          </Button>
+          <Modal show={showModalModeloAbstract} onHide={handleCloseModalModeloAbstract} centered>
+              <Modal.Header closeButton>
+                <Modal.Title>Similarity between cite and referenced paper abstract</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <DoughnutChartSuscritos similitudes={similitudAbstract} colors={customColorsAbstract} />
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseModalModeloAbstract}>
+                  Close
+                </Button>
+              </Modal.Footer>
+          </Modal>
+          <Button variant="outline-secondary" disabled={!isTextPresent} onClick={handleShowModalPolaridad}>
             Obtain polarity
           </Button>
           <Modal show={showModalPolaridad} onHide={handleCloseModalPolaridad} centered>

@@ -24,8 +24,9 @@ class ModelProcessor:
         self.models = []
         self.vocabularies = []
 
+    # Función para cargar los modelos
     def cargarModelos(self):
-        # Cargar todos los modelos
+        
         # Cargar modelos FastText
         fasttext_model = fasttext.load_model(self.fichModels[0])
         self.models.append(fasttext_model)
@@ -51,6 +52,8 @@ class ModelProcessor:
 
         self.modeloCargado = True
 
+    # Función para obtener la similitud entre una cita y un texto (se usa con el abstract, con todos los párrafos
+    # para obtener el de mayor similitud...)
     def obtener_similitud_entre_cita_y_articulo(self, tokens_cita, tokens_articulo):
         if not self.modeloCargado:
             self.cargarModelos()
@@ -117,6 +120,7 @@ class ModelProcessor:
 
         return similitudes
 
+    # Función para obtener la similitud entre dos frases usando BERT
     def obtener_similitud_bert(self, s1, s2):
         max_len = 512  # Longitud máxima permitida por BERT
 
@@ -144,6 +148,7 @@ class ModelProcessor:
         cos_sim = cosine_similarity(embedding_s1, embedding_s2)[0][0]
         return cos_sim
 
+    # Función para obtener la similitud entre dos frases usando SentenceTransformer
     def obtener_similitud_sentence_transformer(self, s1, s2):
         # Calcular las embeddings para ambas frases
         embedding_s1 = self.sentence_model.encode(s1, convert_to_tensor=True)

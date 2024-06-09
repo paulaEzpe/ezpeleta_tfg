@@ -1,3 +1,4 @@
+import logging
 from gensim.models import KeyedVectors
 import fasttext
 import time
@@ -8,50 +9,48 @@ def load_model(fichModel):
         # Intenta cargar el modelo con fasttext
         model = fasttext.load_model(fichModel)
     except Exception as e:
-        print(f"Error al cargar el modelo con load: {e}")
+        logging.error(f"Error al cargar el modelo con load: {e}")
         try:
             # Si falla, intenta cargar el modelo con KeyedVectors
             model = KeyedVectors.load_word2vec_format(fichModel, binary=True)
         except Exception as e:
-            print(f"Error al cargar el modelo con KeyedVectors: {e}")
+            logging.error(f"Error al cargar el modelo con KeyedVectors: {e}")
             model = None
-    print("Modelo cargado.")
+    logging.info("Modelo cargado.")
     return model
 
-def count_oov_words(model, words_txt_file, output_file):
-    # Leer las palabras del archivo .txt
-    with open(words_txt_file, 'r') as f:
-        words = f.read().split()
+def read_words(file_path):
+    with open(file_path, 'r') as f:
+        for line in f:
+            for word in line.split():
+                yield word
+
+def count_oov_words(model, words_txt_files, output_file):
+    # Configurar el registro
+    logging.basicConfig(filename=output_file, level=logging.INFO, format='%(asctime)s - %(message)s')
 
     # Obtener el vocabulario del modelo
     model_vocab = set(model.get_words()) if isinstance(model, fasttext.FastText._FastText) else set(model.vocab)
 
     # Contar las palabras fuera del vocabulario
-    oov_words = []
-    start_time = time.time()
-    for i, word in enumerate(words):
-        if word not in model_vocab:
-            oov_words.append(word)
-        if (i + 1) % 1000 == 0:
-            print(f'Procesadas {i + 1} palabras.')
-    num_oov_words = len(oov_words)
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-
-    # Redirigir la salida a un archivo
-    with open(output_file, 'a') as f:
-        print(f'Modelo usado: {model}', file=f)
-        print(f'Txt usado: {words_txt_file}', file=f)
-        print(f'Número de palabras fuera del vocabulario: {num_oov_words}', file=f)
-        print('Palabras fuera del vocabulario:', ' '.join(oov_words), file=f)
-        print(f'Tiempo transcurrido: {elapsed_time} segundos', file=f)
-        print('', file=f)  # Imprime un salto de línea
+    for txt_file in words_txt_files:
+        start_time = time.time()
+        oov_words = 0
+        with open(txt_file, 'r') as f:
+            for i, word in enumerate(read_words(txt_file)):
+                if word not in model_vocab:
+                    oov_words += 1
+                if (i + 1) % 1000 == 0:
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    logging.info(f'Procesadas {i+1} palabras de {txt_file} en {elapsed_time} segundos')
+        logging.info(f'Palabras OOV en {txt_file}: {oov_words}')
 
 # Uso de las funciones
 fichModel = '../datos/cc.en.300.bin'
-words_txt_file = '../datos/txt_reunidos_21_limpio.txt'
-output_file = 'oov_.txt'
+words_txt_files = ['../datos/txt_reunidos_1_limpio.txt', '../datos/txt_reunidos_2_limpio.txt', '../datos/txt_reunidos_3_limpio.txt', '../datos/txt_reunidos_4_limpio.txt']
+output_file = 'oov_log_fasttext.txt'
 
 model = load_model(fichModel)
 if model is not None:
-    count_oov_words(model, words_txt_file, output_file)
+    count_oov_words(model, words_txt_files, output_file)

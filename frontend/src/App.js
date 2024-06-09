@@ -102,6 +102,7 @@ function App() {
   
 
   const sendReferencedJsonBodyToBackend = async () => {
+    setSimilitud('');
     try {
         // Encontrar el índice donde comienza el cuerpo del texto
         const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");

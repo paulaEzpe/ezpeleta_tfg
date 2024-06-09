@@ -9,8 +9,6 @@ import re
 import spacy
 import time
 
-############Probando spaCy#############
-
 nlp = spacy.load('en_core_web_sm')
 
 class TextProcessor:
@@ -30,17 +28,18 @@ class TextProcessor:
         palabras = texto_limpio.split()
         return palabras
 
+    # Funcion para extraer las citas de un texto (generalmente del parrafo de la seleccion)
     @staticmethod
     def extraer_citas(texto):
         # Expresión regular para encontrar citas
         patron = r'\{\{cite:[^\}]+\}\}'
         # Encontrar todas las coincidencias de la expresión regular en el texto
         citas_encontradas = re.findall(patron, texto)
-        # Retornar las citas encontradas
+        # Devolver las citas encontradas
         return citas_encontradas
 
 
-    # dados dos strings, devuelve una lista con las palabras alfabéticas de cada uno de ellos
+    # Dados dos strings, devuelve dos lista con las palabras alfabéticas de cada uno de ellos
     @staticmethod
     def obtain_list_english_words(texto, cita):
 
@@ -58,6 +57,7 @@ class TextProcessor:
 
         return obtained_text_words, obtained_cite_words
 
+    # Funcion para obtener una lista de palabras alfabéticas a partir de un texto
     @staticmethod
     def obtain_list_english_words_from_body(texto):
         # Poner en minúsculas el texto y la cita
@@ -74,6 +74,8 @@ class TextProcessor:
 
     @staticmethod
     # Funcion que dados dos conjuntos, devuelve true si el primero de ellos contiene al menos el 80% de las palabras del segundo
+    # Esta función se utiliza para comprobar si un parrafo contiene suficientes palabras de una cita, para poder
+    # decir que esa cita corresponde a ese parrafo
     def contiene_suficientes_palabras(conjunto_parrafo, conjunto_cita):
 
         # Hacer un conteo de la cantidad de palabras de la cira que se encuentran en el parrafo
@@ -89,7 +91,9 @@ class TextProcessor:
 
 #---------------------------------------------------
 
-    # dadas dos listas de strings, da la longitud del mayor
+    ######################3ALGORITMO NAIVE########################
+
+    # Dadas dos listas de strings, da la longitud del mayor
     # prefijo comun, empezando en los índices i1, i2, respectivamente
     @staticmethod
     def longestPrefixIndex(list_1,i1,list_2,i2, maxLongPosible):
@@ -99,7 +103,7 @@ class TextProcessor:
     
         return k
  
-    # guardar el set de la cita fuera del bucle
+
     def longestCommonSubseq(self, list_1, list_2):
         longest = 0
         if self.contiene_suficientes_palabras(set(list_1), set(list_2)):
@@ -116,6 +120,8 @@ class TextProcessor:
         return longest
 
     #########################Algoritmo KMP###########################
+
+    # Para entender qué hacen las funciones, leer especificación del algoritmo
 
     @staticmethod
     def compute_prefix_function(pattern):

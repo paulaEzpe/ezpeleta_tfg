@@ -14,7 +14,7 @@ class PDFProcessor:
     def __init__(self):
         pass
 
-    # Para extraer el paper_id del pdf de archive que busquemos
+    # Para extraer el paper_id del pdf de arxiv, a partir del texto plano del articulo completo
     def extraer_arxiv(texto):
         regex = r"arXiv:(\d+\.\d+(?:v\d+)?)"
         match = re.search(regex, texto)
@@ -25,6 +25,8 @@ class PDFProcessor:
         else:
             return None 
     
+    # Para extraer el paper_id del pdf de arxiv, a partir de la referencia del articulo, al hacer click
+    # en la referencia concreta en la lista de referencias
     def extraer_arxiv_de_entry_raw(referencia):
         regex = r"arXiv:(\d+\.\d+)"  # \D coincide con cualquier carácter que no sea un número
         match = re.search(regex, referencia)
@@ -62,13 +64,9 @@ class PDFProcessor:
             for page in pdf_reader.pages:
                 texto += page.extract_text()
         return texto
-    # Ejemplo de uso
-    # texto_extraido, ruta_del_pdf = descargar_y_extraer_texto_pdf_arxiv("1401.4766", "../datos/")
-    # print("Texto extraído del PDF:")
-    # print(texto_extraido)
     
     
-    # Función para descargar un pdf y extraer su texto
+    # Función para descargar un pdf y extraer su texto y devolverlo
     def descargar_y_extraer_texto_pdf_arxiv(arxiv_id, directorio_destino):
         # Construye la URL del PDF
         url_pdf = f"https://arxiv.org/pdf/{arxiv_id}.pdf"

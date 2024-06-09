@@ -365,3 +365,39 @@ quitar disk storage
 unir contexto tecnológico y herramientas utilizadas: hablar de todo lo de fasttext, hablar de ontext otecnologico de modelos de lenguaje,
 busquedas. hablar de que es un modelo de lenguaje, de que hemos usando gensim......
 
+
+CALCULOS DE OOV DE CADA MODELO:
+fasttext:
+2024-06-09 22:13:30,042 - INFO - Palabras OOV en ../datos/txt_reunidos_2_4_limpio.txt: 3296488
+2024-06-09 22:13:30,042 - INFO - Procesadas 67588747 palabras de ../datos/txt_reunidos_2_4_limpio.txt en 11.55 segundos
+2024-06-09 22:13:56,830 - INFO - Palabras OOV en ../datos/txt_reunidos_18_19_20_limpio.txt: 7235363
+2024-06-09 22:13:56,830 - INFO - Procesadas 154636595 palabras de ../datos/txt_reunidos_18_19_20_limpio.txt en 26.79 segundos
+2024-06-09 22:14:51,815 - INFO - Palabras OOV en ../datos/txt_reunidos_21_limpio.txt: 13459129
+2024-06-09 22:14:51,815 - INFO - Procesadas 323264834 palabras de ../datos/txt_reunidos_21_limpio.txt en 54.99 segundos
+2024-06-09 22:15:54,164 - INFO - Palabras OOV en ../datos/txt_reunidos_22_limpio.txt: 15097768
+2024-06-09 22:15:54,164 - INFO - Procesadas 367524793 palabras de ../datos/txt_reunidos_22_limpio.txt en 62.35 segundos
+
+google:
+2024-06-09 21:33:04,099 - INFO - Palabras OOV en ../datos/txt_reunidos_2_4_limpio.txt: 11525280
+2024-06-09 21:33:04,099 - INFO - Procesadas 67588747 palabras de ../datos/txt_reunidos_2_4_limpio.txt en 11.27 segundos
+2024-06-09 21:33:31,758 - INFO - Palabras OOV en ../datos/txt_reunidos_18_19_20_limpio.txt: 25839695
+2024-06-09 21:33:31,758 - INFO - Procesadas 154636595 palabras de ../datos/txt_reunidos_18_19_20_limpio.txt en 27.66 segundos
+2024-06-09 21:34:32,034 - INFO - Palabras OOV en ../datos/txt_reunidos_21_limpio.txt: 51616057
+2024-06-09 21:34:32,035 - INFO - Procesadas 323264834 palabras de ../datos/txt_reunidos_21_limpio.txt en 60.28 segundos
+2024-06-09 21:35:42,449 - INFO - Palabras OOV en ../datos/txt_reunidos_22_limpio.txt: 58348127
+2024-06-09 21:35:42,449 - INFO - Procesadas 367524793 palabras de ../datos/txt_reunidos_22_limpio.txt en 70.41 segundos
+
+paula:
+2024-06-09 22:07:02,151 - INFO - Palabras OOV en ../datos/txt_reunidos_2_4_limpio.txt: 367749
+2024-06-09 22:07:02,151 - INFO - Procesadas 67588747 palabras de ../datos/txt_reunidos_2_4_limpio.txt en 11.32 segundos
+2024-06-09 22:07:30,048 - INFO - Palabras OOV en ../datos/txt_reunidos_18_19_20_limpio.txt: 775366
+2024-06-09 22:07:30,048 - INFO - Procesadas 154636595 palabras de ../datos/txt_reunidos_18_19_20_limpio.txt en 27.90 segundos
+2024-06-09 22:08:24,963 - INFO - Palabras OOV en ../datos/txt_reunidos_21_limpio.txt: 1452619
+2024-06-09 22:08:24,963 - INFO - Procesadas 323264834 palabras de ../datos/txt_reunidos_21_limpio.txt en 54.91 segundos
+2024-06-09 22:09:26,147 - INFO - Palabras OOV en ../datos/txt_reunidos_22_limpio.txt: 1648672
+2024-06-09 22:09:26,147 - INFO - Procesadas 367524793 palabras de ../datos/txt_reunidos_22_limpio.txt en 61.18 segundos
+
+BERT:
+
+BERT + transformers:
+

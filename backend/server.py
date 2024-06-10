@@ -233,6 +233,7 @@ def receive_referenced_json():
 
         # Dividir el texto completo en párrafos
         paragraphs = referencedjsontext.split('\n\n')
+        #NUEVO: aqui si el referenced no esta en la bd, no estara separado en parrafos
 
         # Inicializar variables para almacenar el párrafo con las similitudes más altas
         max_similarity_paragraph = ""

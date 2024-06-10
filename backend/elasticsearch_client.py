@@ -104,9 +104,12 @@ class ElasticsearchClient:
             print("como no se ha encontrado el documento en la base de datos, lo descargo y extraigo el texto")
             # Si el paper_id no se encuentra en la base de datos, descargar y extraer el PDF
             texto_pdf, _ = PDFProcessor.descargar_y_extraer_texto_pdf_arxiv(paper_id_referencia, "../datos/")
-            #aqui habria que meter lo de la expresion regular para obtener la referencia
-            abstract_descargado = "abstract no obtenido aun" + "\n"
-            return texto_pdf, abstract_descargado
+            processor = TextProcessor()
+            texto_abstract, texto_cuerpo = TextProcessor.extraer_texto_desde_patrones(texto_pdf)
+            #aqui habria que meter lo de la expresion regular para obtener el abstract
+            abstract_descargado = texto_abstract + "\n"
+            cuerpo_descargado = texto_cuerpo + "\n"
+            return cuerpo_descargado, abstract_descargado
 
     # Implementado con mi algoritmo
     def obtener_bibliografia_texto_parrafo_seleccion(self, index_name, paper_id, cita):

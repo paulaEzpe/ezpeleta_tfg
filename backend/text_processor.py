@@ -89,6 +89,43 @@ class TextProcessor:
         else:
             return False
 
+    
+    @staticmethod
+    # Función para extraer el texto entre dos patrones usando una expresión regular
+    def extraer_texto_desde_patrones_old(texto):
+    # Expresión regular para buscar desde 'ABSTRACT' hasta 'INTRODUCTION'
+        patron_abstract_intro = re.search(r'((A|a)(B|b)(S|s)(T|t)(R|r)(A|a)(C|c)(T|t))((.|\n)+?)(?=(I|i)(N|n)(T|t)(R|r)(O|o)(D|d)(U|u)(C|c)(T|t)(I|i)(O|o)(N|n))', texto, re.DOTALL)
+        
+        # Inicializar los textos extraídos
+        texto_abstract_intro = None
+        texto_intro_en_adelante = None
+
+        if patron_abstract_intro:
+            # Texto desde 'ABSTRACT' hasta justo antes de 'INTRODUCTION'
+            texto_abstract_intro = patron_abstract_intro.group(8)
+            
+            # Buscar el inicio del texto 'INTRODUCTION' en adelante
+            patron_intro_en_adelante = re.search(r'(I|i)(N|n)(T|t)(R|r)(O|o)(D|d)(U|u)(C|c)(T|t)(I|i)(O|o)(N|n)', texto)
+            if patron_intro_en_adelante:
+                inicio_intro = patron_intro_en_adelante.start()
+                texto_intro_en_adelante = texto[inicio_intro:]
+        
+        return texto_abstract_intro, texto_intro_en_adelante
+
+    def extraer_texto_desde_patrones(texto):
+        r1 = '((.|\n)+)'
+        r2 = '[Aa][Bb][Ss][Tt][Rr][Aa][Cc][Tt]'
+        r3 = '((.|\n)+?)'
+        r4 = '[Ii][Nn][Tt][Rr][Oo][Dd][Uu][Cc][Tt][Ii][Oo][Nn]'
+        r5 = '((.|\n)+)'
+        result = re.search(r1 + r2 + r3 + r4 + r5, texto)
+        if result:
+            #parece que pre_abstract y abstract están en los grupos 1 y 3, respectivamente
+            pre_abstract = result.group(1)
+            abstract = result.group(3)
+            cuerpo = result.group(5)
+        return abstract, cuerpo
+
 #---------------------------------------------------
 
     ######################3ALGORITMO NAIVE########################

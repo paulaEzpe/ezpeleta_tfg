@@ -401,3 +401,48 @@ BERT:
 
 BERT + transformers:
 
+
+
+
+
+
+-----------------------------------------------------------------
+
+
+Autor(es): Bornmann, L., & Daniel, H.-D.
+
+    Título: "What do citation counts measure? A review of studies on citing behavior."
+    Revista: Journal of Documentation
+    Año: 2008
+    DOI: 10.1108/00220410810899796
+    Resumen: Este artículo revisa estudios sobre el comportamiento de citación, discutiendo qué miden los recuentos de citas y cómo se utilizan en la evaluación de la investigación.
+
+Autor(es): Small, H.
+
+    Título: "Co-citation in the scientific literature: A new measure of the relationship between two documents."
+    Revista: Journal of the American Society for Information Science
+    Año: 1973
+    DOI: 10.1002/asi.4630240406
+    Resumen: Introduce el análisis de co-citación como una herramienta para medir la relación entre dos documentos científicos, lo que es relevante para la verificación y análisis de citas.
+
+Autor(es): Gipp, B., & Beel, J.
+
+    Título: "Citation Proximity Analysis (CPA) - A new approach for identifying related work based on co-citation analysis."
+    Revista: Proceedings of the 12th International Conference on Scientometrics and Informetrics
+    Año: 2009
+    Resumen: Presenta un nuevo enfoque para identificar trabajos relacionados basándose en el análisis de proximidad de citas, útil para la recomendación y verificación de citas.
+
+Autor(es): Peroni, S., & Shotton, D.
+
+    Título: "FaBiO and CiTO: ontologies for describing bibliographic resources and citations."
+    Revista: Journal of Web Semantics
+    Año: 2012
+    DOI: 10.1016/j.websem.2012.08.001
+    Resumen: Discute las ontologías FaBiO y CiTO para describir recursos bibliográficos y citas, proporcionando un marco para el análisis detallado de citas y su verificación.
+
+Autor(es): Teufel, S., Siddharthan, A., & Tidhar, D.
+
+    Título: "An annotation scheme for citation function."
+    Revista: Proceedings of the 7th SIGdial Workshop on Discourse and Dialogue
+    Año: 2006
+    Resumen: Propone un esquema de anotación para la función de las citas, lo cual es relevante para entender el contexto y la intención detrás de las citas en la literatura científica.

@@ -381,7 +381,8 @@ function App() {
         console.warn('La cita seleccionada no pertenece a arXiv.');
         return;
     }
-
+    // poner vacio el textarea
+    setReferenceJsonText('');
     try {
         const response = await fetch('/sendCitationToBackend', {
             method: 'POST',

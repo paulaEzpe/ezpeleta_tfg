@@ -627,7 +627,7 @@ function App() {
               <div className="accordion-item" >
                 <h2 className="accordion-header">
                   <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                    Accordion Item #4
+                    Use tool to analyze citations and references
                   </button>
                 </h2>
                 <div className="container_accordion" style={{ maxHeight: '100%', overflowY: 'auto', scrollbarWidth: 'none', /* For Firefox */
@@ -635,21 +635,21 @@ function App() {
                   <div id="collapseFour" className="accordion-collapse collapse" data-bs-parent="#accordionExample" style={{ maxHeight: '100%', overflowY: 'auto' }}>
                     <div className="accordion-body" style={{ maxHeight: '100%', overflowY: 'auto' }}>
                       <div className="input-container">
-                        <input type="text" className="form-control" placeholder="Introduzca ID del paper en Arxiv" value={textInput} onChange={handleTextInputChange} />
+                        <input type="text" className="form-control" placeholder="Enter the paper ID on arXiv" value={textInput} onChange={handleTextInputChange} />
                         <button type="button" className="btn btn-primary" onClick={ () => handleInputSubmit()}>Submit paper</button>
                       </div>
                       <div className="input-container2">
-                        <h4>Texto seleccionado</h4>
+                        <h4>Selected text</h4>
                         {/* Cuadro de entrada de texto de solo lectura */}
                         <textarea className="form-control mt-2 w-100" style={{ 
                           height: '300px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}}  value={selectedText} readOnly 
                         />
-                        <button id="analizar-cita-btn" type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()} disabled={!isAnalizarCitaEnabled}>Analizar cita</button>
+                        <button id="analizar-cita-btn" type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()} disabled={!isAnalizarCitaEnabled}>Analyze citation</button>
 
                       </div>
                       <div className="input-container3">
-                        <h6>Párrafo del texto seleccionado</h6>
+                        <h6>Paragraph of the selected text</h6>
                         {/* Cuadro de entrada de texto de solo lectura */}
                         <textarea className="form-control mt-2 w-100" style={{ 
                           height: '300px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
@@ -659,7 +659,7 @@ function App() {
                       </div>
                       <div style={{ maxHeight: '300px', overflowY: 'auto', scrollbarWidth: 'none', /* For Firefox */
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}}>
-                        <h6>Referencias del párrafo</h6>
+                        <h6>Paragraph references</h6>
                         {/* <ListGroup as="ol" numbered>
                           {filteredCitations.map((citation, index) => (
                             <ListGroup.Item key={index} as="li">{citation}</ListGroup.Item>
@@ -697,7 +697,7 @@ function App() {
               {!downloadedPDF && !viewPDF && <>No PDF</>}
             </Worker>
           </div>
-          <h3 className="text-view">Documento correspondiente a la referencia seleccionada</h3>
+          <h3 className="text-view">Article corresponding to the selected reference</h3>
           <textarea className="form-control mt-2 w-100" style={{ 
                           height: '300px', maxWidth: '90%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}} value={referenceJsonText}

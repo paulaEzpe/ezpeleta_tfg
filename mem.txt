@@ -397,9 +397,19 @@ paula:
 2024-06-09 22:09:26,147 - INFO - Palabras OOV en ../datos/txt_reunidos_22_limpio.txt: 1648672
 2024-06-09 22:09:26,147 - INFO - Procesadas 367524793 palabras de ../datos/txt_reunidos_22_limpio.txt en 61.18 segundos
 
-BERT:
+BERT (es el mismo que sbert):
 
-BERT + transformers:
+2024-06-11 12:17:30,709 - INFO - Palabras OOV en ../datos/txt_reunidos_2_4_limpio.txt: 7619017
+2024-06-11 12:17:30,709 - INFO - Procesadas 67588886 palabras de ../datos/txt_reunidos_2_4_limpio.txt en 417.87 segundos
+2024-06-11 12:35:25,616 - INFO - Palabras OOV en ../datos/txt_reunidos_18_19_20_limpio.txt: 17178156
+2024-06-11 12:35:25,616 - INFO - Procesadas 154636874 palabras de ../datos/txt_reunidos_18_19_20_limpio.txt en 969.80 segundos
+2024-06-11 13:08:39,848 - INFO - Palabras OOV en ../datos/txt_reunidos_21_limpio.txt: 34132153
+2024-06-11 13:08:39,849 - INFO - Procesadas 323265802 palabras de ../datos/txt_reunidos_21_limpio.txt en 1994.23 segundos
+2024-06-11 16:17:13,172 - INFO - Palabras OOV en ../datos/txt_reunidos_22_limpio.txt: 38853595
+2024-06-11 16:17:13,172 - INFO - Procesadas 367525220 palabras de ../datos/txt_reunidos_22_limpio.txt en 11313.32 segundos
+
+
+
 
 
 

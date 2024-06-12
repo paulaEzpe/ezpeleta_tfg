@@ -9,4 +9,8 @@ datos/*.txt
 datos/*.model
 backend/*.txt
 backend/*.log
+polaridad/__pycache__/
+polaridad/logs
+polaridad/*.txt
+polaridad/*.pt
 

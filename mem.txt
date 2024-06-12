@@ -456,3 +456,14 @@ Autor(es): Teufel, S., Siddharthan, A., & Tidhar, D.
     Revista: Proceedings of the 7th SIGdial Workshop on Discourse and Dialogue
     Año: 2006
     Resumen: Propone un esquema de anotación para la función de las citas, lo cual es relevante para entender el contexto y la intención detrás de las citas en la literatura científica.
+
+
+
+salida:
+  warnings.warn(
+100%|=| 198/198 [55:20<00:00
+100%|=| 25/25 [05:57<00:00, 
+1/1 - 100.00%
+[train] loss: 0.7626, acc: 79.95, micro f1: 0.80, macro f1: 0.34
+[test] loss: 0.7499, acc: 80.10, micro f1: 0.80, macro f1: 0.30
+best loss: 0.7499, best acc: 80.10

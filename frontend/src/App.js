@@ -95,12 +95,14 @@ function App() {
     setShowModalModeloAbstract(true);
     sendReferencedJsonAbstractToBackend();
   };
+
+  //aqui habra que llamar a una funcion que mande la cita al backend para que calcule la polaridad, 
+  // y me devuelva la polaridad
   const handleShowModalPolaridad = () => setShowModalPolaridad(true);
 
   const handleCloseModalModeloCuerpo = () => setShowModalModeloCuerpo(false);
   const handleCloseModalModeloAbstract = () => setShowModalModeloAbstract(false);
   const handleCloseModalPolaridad = () => setShowModalPolaridad(false);
-
   
 
   const sendReferencedJsonBodyToBackend = async () => {

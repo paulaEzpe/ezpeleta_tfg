@@ -84,11 +84,13 @@ function App() {
   /////////////////////////////////////////////////////////////////////////////////////////////////
   
   const handleShowModalModeloCuerpo = () => {
+    setParagraph('');
     //borrar cita, parrafo del texto seleccionado y referencas???
     setShowModalModeloCuerpo(true);
     sendReferencedJsonBodyToBackend();
   };
   const handleShowModalModeloAbstract = () => {
+    setParagraph('');
     //borrar cita, parrafo del texto seleccionado y referencas???
     setShowModalModeloAbstract(true);
     sendReferencedJsonAbstractToBackend();
@@ -711,8 +713,9 @@ function App() {
                 <Modal.Title>Similarity between cite and referenced paper body</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                {paragraph}
                 <DoughnutChartSuscritos similitudes={similitud} colors={customColorsBody} />
+                <h5 className="text-view">Paragraph with highest similarity:</h5>
+                {paragraph}
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={handleCloseModalModeloCuerpo}>

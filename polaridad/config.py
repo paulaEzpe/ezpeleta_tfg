@@ -42,7 +42,7 @@ method_names = ["sentibert"]
 """Optimization"""
 train_batch_size = 32
 test_batch_size = 64
-num_epoch = 1
+num_epoch = 50
 lr = 5e-6  # learning rate
 weight_decay = 0.01
 

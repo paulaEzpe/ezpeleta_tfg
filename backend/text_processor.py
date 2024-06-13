@@ -118,13 +118,16 @@ class TextProcessor:
         r3 = '((.|\n)+?)'
         r4 = '[Ii][Nn][Tt][Rr][Oo][Dd][Uu][Cc][Tt][Ii][Oo][Nn]'
         r5 = '((.|\n)+)'
-        result = re.search(r1 + r2 + r3 + r4 + r5, texto)
+        result = re.match(r1 + r2 + r3 + r4 + r5, texto)
         if result:
-            #parece que pre_abstract y abstract están en los grupos 1 y 3, respectivamente
-            pre_abstract = result.group(1)
-            abstract = result.group(3)
+            # parece que pre_abstract y abstract están en los grupos 1 y 3, respectivamente
+            pre_abstract = result.group(1).replace('\n', ' ').replace('\t', ' ')
+            abstract = result.group(3).replace('\n', ' ').replace('\t', ' ')
             cuerpo = result.group(5)
+            # Reemplaza '.\n' por '.\n\n' para separar en párrafos
+            cuerpo = re.sub(r'\.\n', '.\n\n', cuerpo)
         return abstract, cuerpo
+
 
 #---------------------------------------------------
 

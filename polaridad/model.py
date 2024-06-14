@@ -25,11 +25,11 @@ class FNN(nn.Module):
             param.requires_grad = True
 
     def forward(self, inputs):
-        del inputs['attention_weights']
         raw_outputs = self.base_model(**inputs)
         cls_feats = raw_outputs.last_hidden_state[:, 0, :]
         predicts = self.softmax(self.linear(self.dropout(cls_feats)))
         return predicts
+
 
 
 class GRU(nn.Module):

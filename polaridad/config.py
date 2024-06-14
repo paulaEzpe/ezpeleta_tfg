@@ -25,7 +25,7 @@ nltk_path = "/home/featurize/data/nltk_data"
 # scibert_path = "D:/COURSE/dissertation/bert/model/scibert"
 
 corpus_path = "corpus.txt"
-bert_path = "/home/featurize/data/bert-base"
+bert_path = "bert-base-uncased"
 roberta_path = "/home/featurize/data/roberta-base"
 scibert_path = "allenai/scibert_scivocab_uncased"
 

@@ -12,5 +12,5 @@ backend/*.log
 polaridad/__pycache__/
 polaridad/logs
 polaridad/*.txt
-polaridad/*.pt
+datos/*.pt
 

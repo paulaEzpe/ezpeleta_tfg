@@ -11,6 +11,11 @@ from transformers import BertTokenizer, BertModel
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer, util
 
+import torch
+from transformers import AutoTokenizer, AutoModel
+from model import FNN
+
+
 class ModelProcessor:
 
     def __init__(self):
@@ -23,6 +28,9 @@ class ModelProcessor:
         ]
         self.models = []
         self.vocabularies = []
+
+        self.model_path = "../datos/pesos_modelo.pt"  # Ajusta la ruta según donde hayas guardado el modelo
+        self.base_model_path = "bert-base-uncased"  # Ruta al modelo base utilizado durante el entrenamiento
 
     # Función para cargar los modelos
     def cargarModelos(self):
@@ -157,3 +165,48 @@ class ModelProcessor:
         # Calcular la similitud coseno entre las embeddings
         cos_sim = util.pytorch_cos_sim(embedding_s1, embedding_s2).item()
         return cos_sim
+
+    ################################POLARIDAD########################################
+
+    def load_model(self, method_name="fnn"):
+        # Cargar el tokenizador y el modelo base
+        tokenizer = AutoTokenizer.from_pretrained(self.base_model_path, add_prefix_space=True)
+        base_model = AutoModel.from_pretrained(self.base_model_path)
+
+        # Inicializar el modelo específico
+        if method_name == "fnn":
+            model = FNN(base_model, 3)  # Asegúrate de definir num_classes
+        else:
+            raise ValueError("Método desconocido")
+
+        # Cargar pesos entrenados
+        model_state_dict = torch.load(self.model_path, map_location=torch.device('cpu'))
+        model.base_model.embeddings.word_embeddings.weight.data = model_state_dict['base_model.embeddings.word_embeddings.weight']
+        model.load_state_dict(model_state_dict, strict=False)
+
+        # Mover el modelo a la GPU si está disponible
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model.to(device)
+
+        # Poner el modelo en modo de evaluación
+        model.eval()
+
+        return model, tokenizer
+
+    def predict_polarity(self, model, tokenizer, text, device):
+        inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        input_ids = inputs["input_ids"].to(device)
+        attention_mask = inputs["attention_mask"].to(device)
+        return self.predict_polarity_from_inputs(model, {"input_ids": input_ids, "attention_mask": attention_mask})
+
+    def predict_polarity_from_inputs(self, model, inputs):
+        with torch.no_grad():
+            probabilities = model(inputs)
+        return probabilities.cpu().numpy()
+
+    def calcular_polaridad(self, texto):
+        model, tokenizer = self.load_model(method_name="fnn")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        probabilidades = self.predict_polarity(model, tokenizer, texto, device)
+        return probabilidades[0]  # Devolver solo las probabilidades de la primera (y única) entrada
+

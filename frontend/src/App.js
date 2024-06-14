@@ -16,6 +16,7 @@ import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import ListGroup from 'react-bootstrap/ListGroup'
 import DoughnutChartSuscritos from "./components/DoughnutChartSuscritos";
+import PieChartPolaridad from "./components/PieChartPolaridad";
 import Spinner from 'react-bootstrap/Spinner';
 
 
@@ -39,6 +40,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [similitudAbstract, setSimilitudAbstract] = useState(null);
   const [paragraph, setParagraph] = useState("");
+  const [polaridades, setPolaridades] = useState([]);
 
   const customColorsAbstract = {
     backgroundColors: [
@@ -100,13 +102,46 @@ function App() {
   // y me devuelva la polaridad
   const handleShowModalPolaridad = () => {
     setShowModalPolaridad(true);
-    //sendCitationForPolarityToBackend();
+    sendCitationForPolarityToBackend();
   };
 
   const handleCloseModalModeloCuerpo = () => setShowModalModeloCuerpo(false);
   const handleCloseModalModeloAbstract = () => setShowModalModeloAbstract(false);
   const handleCloseModalPolaridad = () => setShowModalPolaridad(false);
   
+  const sendCitationForPolarityToBackend = async () => {
+    setPolaridades([]);
+    try {
+        console.log("he entrado y la cita es: ", selectedText);
+        const response = await fetch('/sendCitationForPolarityToBackend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ selectedText })
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Respuesta del backend:', responseData);
+
+            // Procesar las polaridades recibidas
+            if (responseData.polaridades_list && responseData.polaridades_list.length > 0) {
+              setPolaridades(responseData.polaridades_list);
+              console.log('Polaridades recibidas en el frontend:', polaridades);
+                // Aquí puedes actualizar el estado, UI, etc. con las polaridades
+                // Por ejemplo, si usas React, podrías actualizar el estado con las polaridades
+                // setPolaridades(polaridades);
+            } else {
+                console.error('La respuesta no contiene polaridades.');
+            }
+        } else {
+            console.error('Error al enviar la cita al backend.');
+        }
+    } catch (error) {
+        console.error('Error al enviar la cita al backend:', error);
+    }
+  };
 
   const sendReferencedJsonBodyToBackend = async () => {
     setSimilitud('');
@@ -652,7 +687,7 @@ function App() {
                           height: '300px', maxWidth: '100%', resize: 'none',overflow: 'auto',scrollbarWidth: 'none', /* For Firefox */
                           msOverflowStyle: 'none' /* For Internet Explorer and Edge */}}  value={selectedText} readOnly 
                         />
-                        <button id="analizar-cita-btn" type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()} disabled={!isAnalizarCitaEnabled}>Analyze citation</button>
+                        <button id="analizar-cita-btn" type="button" className="btn btn-primary" onClick={() => sendSelectedTextToBackend()} disabled={!selectedText}>Analyze citation</button>
 
                       </div>
                       <div className="input-container3">
@@ -745,14 +780,14 @@ function App() {
               </Modal.Footer>
           </Modal>
           <Button variant="outline-secondary" disabled={!isTextPresent} onClick={handleShowModalPolaridad}>
-            Obtain polarity
+            Obtain polarity of the cite
           </Button>
           <Modal show={showModalPolaridad} onHide={handleCloseModalPolaridad} centered>
             <Modal.Header closeButton>
-              <Modal.Title>Polarity between cite and referenced paper</Modal.Title>
+              <Modal.Title>Polarity of the cite</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              Here goes a gradient bar
+              <PieChartPolaridad polaridades={polaridades} />
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleCloseModalPolaridad}>

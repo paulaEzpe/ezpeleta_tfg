@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Definir device aquí
 
-    text = "Tu texto aquí para analizar la polaridad"
+    text = "I despise this movie!"
     probabilities = predict_polarity(model, tokenizer, text, device)
 
     print("Probabilidades:", probabilities)

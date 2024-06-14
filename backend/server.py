@@ -345,8 +345,29 @@ def receive_referenced_json_abstract():
             print('No se pudo calcular la similitud entre la cita y el artículo.')
             return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500
 
+#------------------------------------------------------------------------------------
 
+@app.route('/sendCitationForPolarityToBackend', methods=['POST'])
+def receive_citation_polarity():
+    data = request.get_json()
+    selectedText = data.get('selectedText')
 
+    if selectedText:
+        print('Texto seleccionado recibido desde el frontend:', selectedText)
+        print("Tipo de selectedText:", type(selectedText))
+        selectedText_str = str(selectedText)
+        textP = TextProcessor()
+        cite_words = textP.obtain_list_english_words_from_body(selectedText_str)
+        print("Las palabras de la cita son las siguientes: ", cite_words)
+        # Obtener similitudes usando todos los modelos
+        polaridades = modelP.calcular_polaridad(cite_words)
+        polaridades_list = polaridades.tolist() if isinstance(polaridades, np.ndarray) else list(polaridades)
+        print("Polaridades calculadas:", polaridades_list)
+
+        return jsonify({'polaridades_list': polaridades_list})  # Ajustar el nombre de la clave aquí
+    else:
+        return jsonify({'error': 'No se recibió ningún texto seleccionado'}), 400
+    
 ######################################################################################
 
 if __name__ == "__main__":

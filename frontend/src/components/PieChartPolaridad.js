@@ -7,9 +7,9 @@ import { Chart } from 'react-chartjs-2';
 const PieChartPolaridad = ({ polaridades }) => {
   const data = {
     labels: [
-      'Positivo',
-      'Negativo',
-      'Neutro'
+      'Positive',
+      'Negative',
+      'Neutral'
     ],
     datasets: [{
       data: polaridades,

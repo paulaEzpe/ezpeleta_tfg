@@ -148,10 +148,6 @@ def save_selected_text():
         selected_text = selected_text.replace('\n', ' ')
         print('Texto seleccionado tras sustiruir saltos de linea y guiones:', selected_text)
         # AQUI HAY QUE GUARDAR EL TEXTO SELECCIONADO EN VARIABLE DE SESION#
-
-
-
-        # client = conexion()
         # # Obtener la bibliografía
         # resultado = obtener_bibliografia_texto_parrafo_seleccion(client, index_name, session['paper_id'], selected_text)
         client = ElasticsearchClient()
@@ -189,6 +185,8 @@ def get_received_paragraph_text():
 
 #------------------------------------------------------------------------------------
 
+# Se llama cuando se quiere obtener el texto del json del documento referenciado.
+# Devuelve el cuerpo del artículo referenciado y el abtract del artículo referenciado
 @app.route('/sendCitationToBackend', methods=['POST'])
 def receive_citation_from_frontend():
     # Obtener la cita del cuerpo de la solicitud JSON
@@ -220,12 +218,15 @@ def receive_citation_from_frontend():
 
 #------------------------------------------------------------------------------------
 
-# para mandar al backend el texto del json que se ha referenciado para poder usar el modelo
+# Se llama cuando se quiere calcular la similitud entre la cita y los 
+# párrafos del artículo referenciado. Devuelve las similitudes del
+# párrafo que tiene similitudes más altas con la cita y además devuelve
+# el párrafo con las similitudes más altas.
 @app.route('/sendReferencedJsonBodyToBackend', methods=['POST'])
 def receive_referenced_json():
     data = request.get_json()
     referencedjsontext = data.get('referencedjsonbodytextandselectedtext')
-    selectedText = data.get('selectedText')
+    selectedText = data.get('selectedTextSent')
 
     if referencedjsontext and selectedText:
         print('Texto JSON recibido desde el frontend:', referencedjsontext)
@@ -279,46 +280,15 @@ def receive_referenced_json():
             print('No se pudo calcular la similitud entre la cita y el artículo.')
             return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500
 
+#------------------------------------------------------------------------------------
 
-# @app.route('/sendReferencedJsonBodyToBackend', methods=['POST'])
-# def receive_referenced_json():
-#     data = request.get_json()
-#     referencedjsontext = data.get('referencedjsonbodytextandselectedtext')
-#     #aqui habria que cogerlo de la variable de sesion en vez de aqui
-#     selectedText = data.get('selectedText')
-
-#     if referencedjsontext and selectedText:
-#         print('Texto JSON recibido desde el frontend:', referencedjsontext)
-#         print('Texto seleccionado recibido desde el frontend:', selectedText)
-#         # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con los modelos y
-#         # devolver los resultados del modelo
-#         print("Tipo de referencedjsontext:", type(referencedjsontext))
-#         print("Tipo de selectedText:", type(selectedText))
-#         referencedjsontext_str = str(referencedjsontext)
-#         selectedText_str = str(selectedText)
-#         textP = TextProcessor()
-#         text_words, cite_words = textP.obtain_list_english_words(referencedjsontext_str, selectedText_str)
-#         print("Las palabras de la cita son las siguientes: ", cite_words)
-#         # Obtener similitudes usando todos los modelos
-#         similitudes = modelP.obtener_similitud_entre_cita_y_articulo(cite_words, text_words)
-#         # Imprimir las similitudes por terminal
-#         for i, similitud in enumerate(similitudes):
-#             print(f'Similitud entre la cita y el artículo (modelo {i+1}): {similitud}')
-#         # Si alguna similitud está definida, devolver el resultado exitosamente
-#         similitudes = [float(similitud) for similitud in similitudes]
-#         if any(similitudes):
-#             return jsonify({'message': 'Textos recibidos con éxito', 'similitudes': similitudes}), 200
-#         else:
-#             print('No se pudo calcular la similitud entre la cita y el artículo.')
-#             return jsonify({'error': 'No se pudo calcular la similitud entre la cita y el artículo.'}), 500
-
-
-
+# Se llama cuando se quiere calcular la simlitud entre la cita y el abstract del artículo referenciado
+# Devuelve la simlitud entre la cita y el abstract del artículo referenciado
 @app.route('/sendReferencedJsonAbstractToBackend', methods=['POST'])
 def receive_referenced_json_abstract():
     data = request.get_json()
     referencedjsonabstracttext = data.get('referencedjsonabstracttextandselectedtext')
-    selectedText = data.get('selectedText')
+    selectedText = data.get('selectedTextSent')
 
     if referencedjsonabstracttext and selectedText:
         print('Texto JSON recibido desde el frontend:', referencedjsonabstracttext)
@@ -347,10 +317,12 @@ def receive_referenced_json_abstract():
 
 #------------------------------------------------------------------------------------
 
+# Se llama cuando se quiere obtener la polaridad de la cita seleccionada
+# por el usuario. Devuelve la probabilidad de que la cita sea positiva, negativa y neutra
 @app.route('/sendCitationForPolarityToBackend', methods=['POST'])
 def receive_citation_polarity():
     data = request.get_json()
-    selectedText = data.get('selectedText')
+    selectedText = data.get('selectedTextSent')
 
     if selectedText:
         print('Texto seleccionado recibido desde el frontend:', selectedText)

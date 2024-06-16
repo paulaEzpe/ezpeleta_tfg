@@ -24,7 +24,7 @@ class ModelProcessor:
         self.fichModels = [
             '../datos/cc.en.300.bin',
             '../datos/GoogleNews-vectors-negative300.bin',
-            '../datos/1_modelo_entrenado_2_4_18_19_20_21_22.bin'
+            '../datos/modelo_reentrenado_2_4_18_19_20_21_22.model'
         ]
         self.models = []
         self.vocabularies = []

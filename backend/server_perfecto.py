@@ -42,8 +42,6 @@ def init_session():
         session['bibliografia'] = ""
     if 'parrafo_cita' not in session:
         session['parrafo_cita'] = ""
-    if 'texto_seleccionado' not in session:
-        session['texto_seleccionado'] = ""
     
 #---------------------------------------------------------------------------------------
 
@@ -57,9 +55,6 @@ def modify_bibliografia(new_bibliografia):
 
 def modify_parrafo_cita(new_parrafo_cita):
     session['parrafo_cita'] = new_parrafo_cita
-
-def modify_texto_seleccionado(new_texto_seleccionado):
-    session['texto_seleccionado'] = new_texto_seleccionado
 
 
 ################################## ElasticSearch ######################################
@@ -153,11 +148,10 @@ def save_selected_text():
         selected_text = selected_text.replace('\n', ' ')
         print('Texto seleccionado tras sustiruir saltos de linea y guiones:', selected_text)
         # AQUI HAY QUE GUARDAR EL TEXTO SELECCIONADO EN VARIABLE DE SESION#
-        modify_texto_seleccionado(selected_text)
         # # Obtener la bibliografía
         # resultado = obtener_bibliografia_texto_parrafo_seleccion(client, index_name, session['paper_id'], selected_text)
         client = ElasticsearchClient()
-        resultado = client.obtener_bibliografia_texto_parrafo_seleccion(index_name, session['paper_id'], session['texto_seleccionado'])
+        resultado = client.obtener_bibliografia_texto_parrafo_seleccion(index_name, session['paper_id'], selected_text)
         # Acceder a la bibliografía
         bibliografia_obtenida = resultado["bibliografia"]
         # Acceder al párrafo correspondiente a la selección
@@ -232,15 +226,15 @@ def receive_citation_from_frontend():
 def receive_referenced_json():
     data = request.get_json()
     referencedjsontext = data.get('referencedjsonbodytextandselectedtext')
-    selectedText = session.get('texto_seleccionado')  # Obtén el texto seleccionado desde la sesión
+    selectedText = data.get('selectedTextSent')
 
     if referencedjsontext and selectedText:
         print('Texto JSON recibido desde el frontend:', referencedjsontext)
-        print('Texto seleccionado desde la sesión:', selectedText)
+        print('Texto seleccionado recibido desde el frontend:', selectedText)
 
         # Dividir el texto completo en párrafos
         paragraphs = referencedjsontext.split('\n\n')
-        # NUEVO: aqui si el referenced no esta en la bd, no estara separado en parrafos
+        #NUEVO: aqui si el referenced no esta en la bd, no estara separado en parrafos
 
         # Inicializar variables para almacenar el párrafo con las similitudes más altas
         max_similarity_paragraph = ""
@@ -294,11 +288,11 @@ def receive_referenced_json():
 def receive_referenced_json_abstract():
     data = request.get_json()
     referencedjsonabstracttext = data.get('referencedjsonabstracttextandselectedtext')
-    selectedText = session.get('texto_seleccionado')  # Obtén el texto seleccionado desde la sesión
+    selectedText = data.get('selectedTextSent')
 
     if referencedjsonabstracttext and selectedText:
         print('Texto JSON recibido desde el frontend:', referencedjsonabstracttext)
-        print('Texto seleccionado desde la sesión:', selectedText)
+        print('Texto seleccionado recibido desde el frontend:', selectedText)
         # Aquí ahora habría que usar estos textos para comparar el JSON con la cita con los modelos y
         # devolver los resultados del modelo
         print("Tipo de referencedjsonabstracttext:", type(referencedjsonabstracttext))
@@ -327,21 +321,22 @@ def receive_referenced_json_abstract():
 # por el usuario. Devuelve la probabilidad de que la cita sea positiva, negativa y neutra
 @app.route('/sendCitationForPolarityToBackend', methods=['POST'])
 def receive_citation_polarity():
-    selectedText = session.get('texto_seleccionado')  # Obtén el texto seleccionado desde la sesión
+    data = request.get_json()
+    selectedText = data.get('selectedTextSent')
 
     if selectedText:
-        print('Texto seleccionado desde la sesión:', selectedText)
+        print('Texto seleccionado recibido desde el frontend:', selectedText)
         print("Tipo de selectedText:", type(selectedText))
         selectedText_str = str(selectedText)
         textP = TextProcessor()
         cite_words = textP.obtain_list_english_words_from_body(selectedText_str)
         print("Las palabras de la cita son las siguientes: ", cite_words)
-        # Obtener polaridades usando el modelo
+        # Obtener similitudes usando todos los modelos
         polaridades = modelP.calcular_polaridad(cite_words)
         polaridades_list = polaridades.tolist() if isinstance(polaridades, np.ndarray) else list(polaridades)
         print("Polaridades calculadas:", polaridades_list)
 
-        return jsonify({'polaridades_list': polaridades_list})
+        return jsonify({'polaridades_list': polaridades_list})  # Ajustar el nombre de la clave aquí
     else:
         return jsonify({'error': 'No se recibió ningún texto seleccionado'}), 400
     

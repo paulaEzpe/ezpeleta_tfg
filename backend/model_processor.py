@@ -50,6 +50,8 @@ class ModelProcessor:
         self.models.append(word2vec_model)
         self.vocabularies.append(list(word2vec_model.wv.key_to_index.keys()))
 
+
+
         # Cargar modelo BERT
         self.bert_tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
         self.bert_model = BertModel.from_pretrained("bert-base-uncased")

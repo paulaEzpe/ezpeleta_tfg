@@ -114,58 +114,55 @@ function App() {
     setPolaridades([]);
     const toastIdPolaridad = toast.loading('Calculando polaridad de la cita...');
     try {
-      console.log("he entrado y la cita es: ", selectedTextSent);
-      const response = await fetch('/sendCitationForPolarityToBackend', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ selectedTextSent })
-      });
+        const response = await fetch('/sendCitationForPolarityToBackend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Respuesta del backend:', responseData);
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Respuesta del backend:', responseData);
 
-        // Procesar las polaridades recibidas
-        if (responseData.polaridades_list && responseData.polaridades_list.length > 0) {
-          setPolaridades(responseData.polaridades_list);
-          console.log('Polaridades recibidas en el frontend:', polaridades);
-          // Aquí puedes actualizar el estado, UI, etc. con las polaridades
-          // Por ejemplo, si usas React, podrías actualizar el estado con las polaridades
-          // setPolaridades(polaridades);
-          toast.update(toastIdPolaridad, {
-            render: 'Polaridad obtenida!',
-            type: 'success',
-            autoClose: 3000,
-            isLoading: false
-          });
+            // Procesar las polaridades recibidas
+            if (responseData.polaridades_list && responseData.polaridades_list.length > 0) {
+                setPolaridades(responseData.polaridades_list);
+                console.log('Polaridades recibidas en el frontend:', responseData.polaridades_list);
+                // Aquí puedes actualizar el estado, UI, etc. con las polaridades
+                // Por ejemplo, si usas React, podrías actualizar el estado con las polaridades
+                toast.update(toastIdPolaridad, {
+                    render: 'Polaridad obtenida!',
+                    type: 'success',
+                    autoClose: 3000,
+                    isLoading: false
+                });
+            } else {
+                console.error('La respuesta no contiene polaridades.');
+                toast.update(toastIdPolaridad, {
+                    render: 'No se ha podido calcular la polaridad.',
+                    type: 'error',
+                    autoClose: 3000,
+                    isLoading: false
+                });
+            }
         } else {
-          console.error('La respuesta no contiene polaridades.');
-          toast.update(toastIdPolaridad, {
+            console.error('Error al enviar la cita al backend.');
+            toast.update(toastIdPolaridad, {
+                render: 'No se ha podido calcular la polaridad.',
+                type: 'error',
+                autoClose: 3000,
+                isLoading: false
+            });
+        }
+    } catch (error) {
+        console.error('Error al enviar la cita al backend:', error);
+        toast.update(toastIdPolaridad, {
             render: 'No se ha podido calcular la polaridad.',
             type: 'error',
             autoClose: 3000,
             isLoading: false
-          });
-        }
-      } else {
-        console.error('Error al enviar la cita al backend.');
-        toast.update(toastIdPolaridad, {
-          render: 'No se ha podido calcular la polaridad.',
-          type: 'error',
-          autoClose: 3000,
-          isLoading: false
         });
-      }
-    } catch (error) {
-      console.error('Error al enviar la cita al backend:', error);
-      toast.update(toastIdPolaridad, {
-        render: 'No se ha podido calcular la polaridad.',
-        type: 'error',
-        autoClose: 3000,
-        isLoading: false
-      });
     }
   };
 
@@ -173,71 +170,71 @@ function App() {
     setSimilitud('');
     const toastIdBody = toast.loading('Calculando similitud entre la cita y los párrafos del cuerpo...');
     try {
-      // Encontrar el índice donde comienza el cuerpo del texto
-      const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
+        // Encontrar el índice donde comienza el cuerpo del texto
+        const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
 
-      // Si "texto cuerpo:" se encuentra en referenceJsonText, extraerlo
-      let cuerpoDelTexto = referenceJsonText;
-      if (cuerpoDelTextoIndex !== -1) {
-        // Extraer el texto que sigue después de "texto cuerpo:"
-        cuerpoDelTexto = referenceJsonText.substring(cuerpoDelTextoIndex + "Texto del Cuerpo:".length).trim();
-        console.log('Cuerpo del texto:', cuerpoDelTexto);
-      } else {
-        console.error('No se encontró "texto cuerpo:" en el texto de la referencia.');
-        return;
-      }
-
-      // Enviar solo el cuerpo del texto al backend
-      const response = await fetch('/sendReferencedJsonBodyToBackend', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ referencedjsonbodytextandselectedtext: cuerpoDelTexto, selectedTextSent })
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Respuesta del backend:', responseData);
-
-        if (responseData.similitudes && responseData.similitudes.length > 0) {
-          // Actualizar el estado con las similitudes recibidas y el párrafo correspondiente
-          setSimilitud(responseData.similitudes);
-          setParagraph(responseData.paragraph);
-          console.log('Similitudes recibidas:', responseData.similitudes);
-          console.log('Párrafo con las similitudes más altas:', responseData.paragraph);
-          toast.update(toastIdBody, {
-            render: 'Párrafo con mayor similitud con la cita encontrado!',
-            type: 'success',
-            autoClose: 4000,
-            isLoading: false
-          });
+        // Si "texto cuerpo:" se encuentra en referenceJsonText, extraerlo
+        let cuerpoDelTexto = referenceJsonText;
+        if (cuerpoDelTextoIndex !== -1) {
+            // Extraer el texto que sigue después de "texto cuerpo:"
+            cuerpoDelTexto = referenceJsonText.substring(cuerpoDelTextoIndex + "Texto del Cuerpo:".length).trim();
+            console.log('Cuerpo del texto:', cuerpoDelTexto);
         } else {
-          console.error('El backend no devolvió las similitudes esperadas.');
-          toast.update(toastIdBody, {
+            console.error('No se encontró "texto cuerpo:" en el texto de la referencia.');
+            return;
+        }
+
+        // Enviar solo el cuerpo del texto al backend
+        const response = await fetch('/sendReferencedJsonBodyToBackend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ referencedjsonbodytextandselectedtext: cuerpoDelTexto })
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Respuesta del backend:', responseData);
+
+            if (responseData.similitudes && responseData.similitudes.length > 0) {
+                // Actualizar el estado con las similitudes recibidas y el párrafo correspondiente
+                setSimilitud(responseData.similitudes);
+                setParagraph(responseData.paragraph);
+                console.log('Similitudes recibidas:', responseData.similitudes);
+                console.log('Párrafo con las similitudes más altas:', responseData.paragraph);
+                toast.update(toastIdBody, {
+                    render: 'Párrafo con mayor similitud con la cita encontrado!',
+                    type: 'success',
+                    autoClose: 4000,
+                    isLoading: false
+                });
+            } else {
+                console.error('El backend no devolvió las similitudes esperadas.');
+                toast.update(toastIdBody, {
+                    render: 'Párrafo con mayor similitud con la cita no encontrado',
+                    type: 'error',
+                    autoClose: 4000,
+                    isLoading: false
+                });
+            }
+        } else {
+            console.error('Error al enviar el texto al backend.');
+            toast.update(toastIdBody, {
+                render: 'Párrafo con mayor similitud con la cita no encontrado',
+                type: 'error',
+                autoClose: 4000,
+                isLoading: false
+            });
+        }
+    } catch (error) {
+        console.error('Error al enviar el texto al backend:', error);
+        toast.update(toastIdBody, {
             render: 'Párrafo con mayor similitud con la cita no encontrado',
             type: 'error',
             autoClose: 4000,
             isLoading: false
-          });
-        }
-      } else {
-        console.error('Error al enviar el texto al backend.');
-        toast.update(toastIdBody, {
-          render: 'Párrafo con mayor similitud con la cita no encontrado',
-          type: 'error',
-          autoClose: 4000,
-          isLoading: false
         });
-      }
-    } catch (error) {
-      console.error('Error al enviar el texto al backend:', error);
-      toast.update(toastIdBody, {
-        render: 'Párrafo con mayor similitud con la cita no encontrado',
-        type: 'error',
-        autoClose: 4000,
-        isLoading: false
-      });
     }
   };
 
@@ -245,71 +242,71 @@ function App() {
   const sendReferencedJsonAbstractToBackend = async () => {
     const toastIdAbstract = toast.loading('Calculando similitud entre cita y abstract...');
     try {
-      // Encontrar el índice donde comienza el abstract
-      const abstractIndex = referenceJsonText.indexOf("Abstract:");
+        // Encontrar el índice donde comienza el abstract
+        const abstractIndex = referenceJsonText.indexOf("Abstract:");
 
-      // Encontrar el índice donde comienza el cuerpo del texto
-      const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
+        // Encontrar el índice donde comienza el cuerpo del texto
+        const cuerpoDelTextoIndex = referenceJsonText.indexOf("Texto del Cuerpo:");
 
-      // Si "Abstract:" y "Texto del Cuerpo:" se encuentran en referenceJsonText, extraer el texto entre ellos
-      if (abstractIndex !== -1 && cuerpoDelTextoIndex !== -1) {
-        // Extraer el texto entre "Abstract:" y "Texto del Cuerpo:" (excluyendo ambas etiquetas)
-        const textoEntreAbstractYCuerpo = referenceJsonText.substring(abstractIndex + "Abstract:".length, cuerpoDelTextoIndex).trim();
-        console.log('Texto entre Abstract y Texto del Cuerpo:', textoEntreAbstractYCuerpo);
+        // Si "Abstract:" y "Texto del Cuerpo:" se encuentran en referenceJsonText, extraer el texto entre ellos
+        if (abstractIndex !== -1 && cuerpoDelTextoIndex !== -1) {
+            // Extraer el texto entre "Abstract:" y "Texto del Cuerpo:" (excluyendo ambas etiquetas)
+            const textoEntreAbstractYCuerpo = referenceJsonText.substring(abstractIndex + "Abstract:".length, cuerpoDelTextoIndex).trim();
+            console.log('Texto entre Abstract y Texto del Cuerpo:', textoEntreAbstractYCuerpo);
 
-        // Enviar solo el texto entre Abstract y Texto del Cuerpo al backend
-        const response = await fetch('/sendReferencedJsonAbstractToBackend', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ referencedjsonabstracttextandselectedtext: textoEntreAbstractYCuerpo, selectedTextSent })
-        });
-
-        if (response.ok) {
-          const responseData = await response.json();
-          console.log('Respuesta del backend:', responseData);
-
-          if (responseData.similitudes && responseData.similitudes.length > 0) {
-            // Actualizar el estado con las similitudes recibidas
-            setSimilitudAbstract(responseData.similitudes);
-            console.log('Similitudes recibidas:', responseData.similitudes);
-            toast.update(toastIdAbstract, {
-              render: 'Similitud calculada!',
-              type: 'success',
-              autoClose: 3000,
-              isLoading: false
+            // Enviar solo el texto entre Abstract y Texto del Cuerpo al backend
+            const response = await fetch('/sendReferencedJsonAbstractToBackend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ referencedjsonabstracttextandselectedtext: textoEntreAbstractYCuerpo })
             });
-          } else {
-            console.error('El backend no devolvió las similitudes esperadas.');
-            toast.update(toastIdAbstract, {
-              render: 'No se ha podido calcular la similitud entre la cita y el abstract',
-              type: 'error',
-              autoClose: 3000,
-              isLoading: false
-            });
-          }
+
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log('Respuesta del backend:', responseData);
+
+                if (responseData.similitudes && responseData.similitudes.length > 0) {
+                    // Actualizar el estado con las similitudes recibidas
+                    setSimilitudAbstract(responseData.similitudes);
+                    console.log('Similitudes recibidas:', responseData.similitudes);
+                    toast.update(toastIdAbstract, {
+                        render: 'Similitud calculada!',
+                        type: 'success',
+                        autoClose: 3000,
+                        isLoading: false
+                    });
+                } else {
+                    console.error('El backend no devolvió las similitudes esperadas.');
+                    toast.update(toastIdAbstract, {
+                        render: 'No se ha podido calcular la similitud entre la cita y el abstract',
+                        type: 'error',
+                        autoClose: 3000,
+                        isLoading: false
+                    });
+                }
+            } else {
+                console.error('Error al enviar la cita al backend.');
+                toast.update(toastIdAbstract, {
+                    render: 'No se ha podido calcular la similitud entre la cita y el abstract',
+                    type: 'error',
+                    autoClose: 3000,
+                    isLoading: false
+                });
+            }
         } else {
-          console.error('Error al enviar la cita al backend.');
-          toast.update(toastIdAbstract, {
-            render: 'No se ha podido calcular la similitud entre la cita y el abstract',
-            type: 'error',
-            autoClose: 3000,
-            isLoading: false
-          });
+            console.error('No se encontró "Abstract:" o "Texto del Cuerpo:" en el texto de la referencia.');
+            toast.update(toastIdAbstract, {
+                render: 'No se ha podido calcular la similitud entre la cita y el abstract',
+                type: 'error',
+                autoClose: 3000,
+                isLoading: false
+            });
+            return;
         }
-      } else {
-        console.error('No se encontró "Abstract:" o "Texto del Cuerpo:" en el texto de la referencia.');
-        toast.update(toastIdAbstract, {
-          render: 'No se ha podido calcular la similitud entre la cita y el abstract',
-          type: 'error',
-          autoClose: 3000,
-          isLoading: false
-        });
-        return;
-      }
     } catch (error) {
-      console.error('Error al enviar la cita al backend:', error);
+        console.error('Error al enviar la cita al backend:', error);
     }
   };
 
@@ -448,28 +445,6 @@ function App() {
     }
   }
 
-  // const handleClick = async (citationContent) => {
-  //   // Imprimir el contenido por terminal
-  //   console.log('Contenido de la cita:', citationContent);
-
-  //   try {
-  //       // Enviar el contenido al backend
-  //       const response = await fetch('/sendCitationToBackend', {
-  //           method: 'POST',
-  //           headers: {
-  //               'Content-Type': 'application/json'
-  //           },
-  //           body: JSON.stringify({ citation: citationContent })
-  //       });
-  //       if (response.ok) {
-  //           console.log('Cita enviada al backend con éxito.');
-  //       } else {
-  //           console.error('Error al enviar la cita al backend.');
-  //       }
-  //   } catch (error) {
-  //       console.error('Error al enviar la cita al backend:', error);
-  //   }
-  // }
 
   const handleClick = async (citationContent) => {
     console.log('Contenido de la cita:', citationContent);
@@ -528,20 +503,6 @@ function App() {
 
   const isTextPresent = referenceJsonText.length > 0;
 
-  // async function fetchParagraphFromBackend() {
-  //   try {
-  //       const response = await fetch('/getTextParagraphSelection');
-  //       if (response.ok) {
-  //           const paragraphText = await response.text();
-  //           console.log(paragraphText); // Aquí puedes manejar el string recibido
-  //           setParagraphText(paragraphText);
-  //       } else {
-  //           console.error('Error al obtener el parrafo del backend.');
-  //       }
-  //   } catch (error) {
-  //       console.error('Error al obtener el parrafo del backend:', error);
-  //   }
-  // }
 
   async function fetchParagraphFromBackend() {
     try {
@@ -566,34 +527,6 @@ function App() {
       console.error('Error al obtener el parrafo del backend:', error);
     }
   }
-
-  async function fetchParagraphFromBackend() {
-    try {
-      const response = await fetch('/getTextParagraphSelection');
-      if (response.ok) {
-        const paragraphText = await response.text();
-        console.log(paragraphText); // Aquí puedes manejar el string recibido
-        const citationMap = {};
-        let nextIndex = 1;
-        // Reemplazar cada cita con un número de referencia
-        const updatedText = paragraphText.replace(/\{\{cite:(.*?)\}\}/g, (_, id) => {
-          if (!citationMap[id]) {
-            citationMap[id] = nextIndex++;
-          }
-          return `[${citationMap[id]}]`;
-        });
-        setParagraphText(updatedText);
-      } else {
-        console.error('Error al obtener el parrafo del backend.');
-      }
-    } catch (error) {
-      console.error('Error al obtener el parrafo del backend:', error);
-    }
-  }
-
-
-
-
 
   const fileType = ['application/pdf'];
 
@@ -664,6 +597,7 @@ function App() {
             else {
               toast.error('El artículo no se encuentra en la base de datos. No podrá analizar citas ni referencias.');
               console.log('Error al encontrar el título:', error);
+              setIsAnalizarCitaEnabled(false);
             }
           } else {
             // Si no se encuentra el documento, mostrar mensaje y mantener botón desactivado
@@ -713,6 +647,7 @@ function App() {
           else {
             toast.error('El artículo no se encuentra en la base de datos. No podrá analizar citas ni referencias.');
             console.log('Error al encontrar el título:', error);
+            setIsAnalizarCitaEnabled(false);
           }
         } else {
           // Si no se encuentra el documento, mostrar mensaje y mantener botón desactivado

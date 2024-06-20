@@ -124,7 +124,7 @@ class Train:
             macro_f1 += self.macro_f1(predicts, targets)
 
         # Guardar el modelo
-        torch.save(self.model.state_dict(), "pesos_modelo.pt")
+        torch.save(self.model.state_dict(), "sentibert_pesos_modelo.pt")
 
         return train_loss / n_train, n_correct / n_train, micro_f1 / n, macro_f1 / n
 

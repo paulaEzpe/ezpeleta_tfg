@@ -13,7 +13,7 @@ from sentence_transformers import SentenceTransformer, util
 
 import torch
 from transformers import AutoTokenizer, AutoModel
-from model import FNN
+from model import FNN, sentibert
 
 
 class ModelProcessor:
@@ -24,7 +24,7 @@ class ModelProcessor:
         self.fichModels = [
             '../datos/cc.en.300.bin',
             '../datos/GoogleNews-vectors-negative300.bin',
-            '../datos/1_modelo_entrenado_2_4_18_19_20_21_22.bin'
+            '../datos/modelo_reentrenado_2_4_18_19_20_21_22.model'
         ]
         self.models = []
         self.vocabularies = []
@@ -178,6 +178,8 @@ class ModelProcessor:
         # Inicializar el modelo específico
         if method_name == "fnn":
             model = FNN(base_model, 3)  # Asegúrate de definir num_classes
+        elif method_name == "sentibert":
+            model = sentibert(base_model, 3)  # Asegúrate de definir num_classes
         else:
             raise ValueError("Método desconocido")
 
@@ -209,6 +211,9 @@ class ModelProcessor:
     def calcular_polaridad(self, texto):
         model, tokenizer = self.load_model(method_name="fnn")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        probabilidades = self.predict_polarity(model, tokenizer, texto, device)
+        # probabilidades = self.predict_polarity(model, tokenizer, texto, device)
+        probabilidades = self.predict_polarity(model, tokenizer, ' '.join(texto), device)
+        print (f'texto: {" ".join(texto)} len: {texto}')
+        print (f'len prob: {probabilidades}')
         return probabilidades[0]  # Devolver solo las probabilidades de la primera (y única) entrada
 
